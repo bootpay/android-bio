@@ -32,7 +32,7 @@ dependencies {
 ```
 
 
-#### 실행시 Cleartext HTTP traffic to Your.Domain not permitted 와 같은 에러가 나온 경우
+#### 실행시 Webpage not available. net:ERR_CLEARTEXT_NOT_PERMITTED 에러가 나온 경우
 
 Android [네트워크 보안 구성](https://developer.android.com/training/articles/security-config#CleartextTrafficPermitted)에 따르면 안드로이드 9\(API28\)부터 cleartext traffic을 기본적으로를 비활성화한다고 합니다. 따라서 API 28 이후에서 Http에 접근하려면 cleartext traffic을 활성화 시켜야 합니다.
 
