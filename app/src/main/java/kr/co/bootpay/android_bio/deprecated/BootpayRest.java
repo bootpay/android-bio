@@ -2,7 +2,7 @@ package kr.co.bootpay.android_bio.deprecated;
 
 import android.content.Context;
 
-import kr.co.bootpay.core.models.BootUser;
+import kr.co.bootpay.android.models.BootUser;
 
 
 // 이 로직은 서버사이드에서 수행되어야 합니다.

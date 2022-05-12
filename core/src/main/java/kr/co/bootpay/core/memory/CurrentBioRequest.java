@@ -8,7 +8,7 @@ import kr.co.bootpay.core.constants.BioConstants;
 import kr.co.bootpay.core.models.BioDevice;
 import kr.co.bootpay.core.models.BioPayload;
 import kr.co.bootpay.core.models.data.WalletData;
-import kr.co.bootpay.core.events.BootpayEventListener;
+import kr.co.bootpay.android.events.BootpayEventListener;
 
 public class CurrentBioRequest {
     private static CurrentBioRequest instance = null;

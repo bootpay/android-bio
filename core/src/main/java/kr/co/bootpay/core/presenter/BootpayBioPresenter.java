@@ -27,7 +27,7 @@ import kr.co.bootpay.core.models.ResError;
 import kr.co.bootpay.core.models.ResWalletList;
 import kr.co.bootpay.core.models.data.WalletData;
 import kr.co.bootpay.core.webview.BootpayBioWebView;
-import kr.co.bootpay.core.pref.UserInfo;
+import kr.co.bootpay.android.pref.UserInfo;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;

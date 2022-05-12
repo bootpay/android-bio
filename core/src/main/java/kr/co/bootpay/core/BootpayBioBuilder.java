@@ -14,7 +14,7 @@ import kr.co.bootpay.core.activity.BootpayBioActivity;
 import kr.co.bootpay.core.constants.BioConstants;
 import kr.co.bootpay.core.memory.CurrentBioRequest;
 import kr.co.bootpay.core.models.BioPayload;
-import kr.co.bootpay.core.events.BootpayEventListener;
+import kr.co.bootpay.android.events.BootpayEventListener;
 
 public class BootpayBioBuilder {
     private Context mContext;

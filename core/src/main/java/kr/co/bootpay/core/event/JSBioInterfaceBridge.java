@@ -2,7 +2,7 @@ package kr.co.bootpay.core.event;
 
 import android.webkit.JavascriptInterface;
 
-import kr.co.bootpay.core.events.JSInterfaceBridge;
+import kr.co.bootpay.android.events.JSInterfaceBridge;
 
 public interface JSBioInterfaceBridge extends JSInterfaceBridge {
 //    @JavascriptInterface

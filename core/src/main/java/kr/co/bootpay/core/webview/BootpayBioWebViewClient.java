@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import java.util.List;
 
 import kr.co.bootpay.core.memory.CurrentBioRequest;
-import kr.co.bootpay.core.webview.BootpayUrlHelper;
+import kr.co.bootpay.android.webview.BootpayUrlHelper;
 
 public class BootpayBioWebViewClient extends WebViewClient {
 

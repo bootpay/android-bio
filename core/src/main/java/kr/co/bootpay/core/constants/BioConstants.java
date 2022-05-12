@@ -16,8 +16,8 @@ import kr.co.bootpay.core.models.BioPayload;
 import kr.co.bootpay.core.models.BiometricAuthenticate;
 import kr.co.bootpay.core.models.DestroyWallet;
 import kr.co.bootpay.core.models.OTPPayload;
-import kr.co.bootpay.core.constants.BootpayConstant;
-import kr.co.bootpay.core.models.BootExtra;
+import kr.co.bootpay.android.constants.BootpayConstant;
+import kr.co.bootpay.android.models.BootExtra;
 
 public class BioConstants extends BootpayConstant {
 

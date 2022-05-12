@@ -4,7 +4,7 @@ import android.util.Log;
 
 import java.io.IOException;
 
-import kr.co.bootpay.core.models.BootUser;
+import kr.co.bootpay.android.models.BootUser;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

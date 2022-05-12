@@ -28,12 +28,12 @@ import kr.co.bootpay.core.memory.CurrentBioRequest;
 import kr.co.bootpay.core.models.BioPayload;
 import kr.co.bootpay.core.models.NextJob;
 import kr.co.bootpay.core.models.ResBiometric;
-import kr.co.bootpay.core.api.BootpayDialog;
-import kr.co.bootpay.core.api.BootpayDialogX;
-import kr.co.bootpay.core.api.BootpayInterface;
-import kr.co.bootpay.core.constants.BootpayBuildConfig;
-import kr.co.bootpay.core.constants.BootpayConstant;
-import kr.co.bootpay.core.pref.UserInfo;
+import kr.co.bootpay.android.api.BootpayDialog;
+import kr.co.bootpay.android.api.BootpayDialogX;
+import kr.co.bootpay.android.api.BootpayInterface;
+import kr.co.bootpay.android.constants.BootpayBuildConfig;
+import kr.co.bootpay.android.constants.BootpayConstant;
+import kr.co.bootpay.android.pref.UserInfo;
 
 
 public class BootpayBioWebView extends WebView implements BootpayInterface {

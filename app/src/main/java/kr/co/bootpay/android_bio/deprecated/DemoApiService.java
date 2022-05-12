@@ -5,9 +5,9 @@ import android.content.Context;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import kr.co.bootpay.core.cookiejar.PersistentCookieJar;
-import kr.co.bootpay.core.cookiejar.cache.SetCookieCache;
-import kr.co.bootpay.core.cookiejar.persistence.SharedPrefsCookiePersistor;
+import kr.co.bootpay.android.cookiejar.PersistentCookieJar;
+import kr.co.bootpay.android.cookiejar.cache.SetCookieCache;
+import kr.co.bootpay.android.cookiejar.persistence.SharedPrefsCookiePersistor;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;

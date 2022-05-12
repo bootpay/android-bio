@@ -7,9 +7,15 @@ import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-import kr.co.bootpay.core.models.BootExtra;
-import kr.co.bootpay.core.models.BootItem;
-import kr.co.bootpay.core.models.BootUser;
+
+import kr.co.bootpay.android.events.BootpayEventListener;
+import kr.co.bootpay.android.models.BootExtra;
+import kr.co.bootpay.android.models.BootItem;
+import kr.co.bootpay.android.models.BootUser;
+
+//import kr.co.bootpay.core.models.BootExtra;
+//import kr.co.bootpay.core.models.BootItem;
+//import kr.co.bootpay.android.models.BootUser;
 
 public class BioPayload  {
     String applicationId = "";
