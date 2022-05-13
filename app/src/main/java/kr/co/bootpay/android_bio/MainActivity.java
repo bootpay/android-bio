@@ -81,55 +81,55 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
                 .setUserToken(easyUserToken)
                 .setPrice(50000.0) //최종 결제 금액
                 .setOrderId(String.valueOf(System.currentTimeMillis())) //개발사에서 관리하는 주문번호
-                .setUser(user);
-//                .setExtra(extra)
-//                .setOrderName("플리츠레이어 카라숏원피스")
-//                .setNames(Arrays.asList("블랙 (COLOR)", "55 (SIZE)")) //결제창에 나타날 상품목록
-//                .setPrices(Arrays.asList(new BioPrice("상품가격", 89000.0),  //결제창에 나타날 가격목록
-//                        new BioPrice("쿠폰적용", -25000.0),
-//                        new BioPrice("배송비", 2500.0)));
-//
-//        BootpayBio.init(this)
-//                .setBioPayload(bioPayload)
-//                .setEventListener(new BootpayEventListener() {
-//                    @Override
-//                    public void onCancel(String data) {
-//                        Log.d("bootpay cancel", data);
-//                    }
-//
-//                    @Override
-//                    public void onError(String data) {
-//                        Log.d("bootpay error", data);
-////                        BootpayBio.removePaymentWindow();
-//                    }
-//
-//                    @Override
-//                    public void onClose(String data) {
-//                        Log.d("bootpay close", data);
+                .setUser(user)
+                .setExtra(extra)
+                .setOrderName("플리츠레이어 카라숏원피스")
+                .setNames(Arrays.asList("블랙 (COLOR)", "55 (SIZE)")) //결제창에 나타날 상품목록
+                .setPrices(Arrays.asList(new BioPrice("상품가격", 89000.0),  //결제창에 나타날 가격목록
+                        new BioPrice("쿠폰적용", -25000.0),
+                        new BioPrice("배송비", 2500.0)));
+
+        BootpayBio.init(this)
+                .setBioPayload(bioPayload)
+                .setEventListener(new BootpayEventListener() {
+                    @Override
+                    public void onCancel(String data) {
+                        Log.d("bootpay cancel", data);
+                    }
+
+                    @Override
+                    public void onError(String data) {
+                        Log.d("bootpay error", data);
 //                        BootpayBio.removePaymentWindow();
-//                    }
-//
-//                    @Override
-//                    public void onIssued(String data) {
-//                        Log.d("bootpay issued", data);
-//
-//                    }
-//
-//
-//                    @Override
-//                    public boolean onConfirm(String data) {
-//                        Log.d("bootpay confirm", data);
-////                        return false; //재고 없으면 return false
-////                        BootpayBio.transactionConfirm(data);
-//                        return true; // 재고 있으면 return true
-//                    }
-//
-//                    @Override
-//                    public void onDone(String data) {
-//                        Log.d("bootpay done", data);
-////                        BootpayBio.removePaymentWindow();
-//                    }
-//                })
-//                .requestPayment();
+                    }
+
+                    @Override
+                    public void onClose(String data) {
+                        Log.d("bootpay close", data);
+                        BootpayBio.removePaymentWindow();
+                    }
+
+                    @Override
+                    public void onIssued(String data) {
+                        Log.d("bootpay issued", data);
+
+                    }
+
+
+                    @Override
+                    public boolean onConfirm(String data) {
+                        Log.d("bootpay confirm", data);
+//                        return false; //재고 없으면 return false
+//                        BootpayBio.transactionConfirm(data);
+                        return true; // 재고 있으면 return true
+                    }
+
+                    @Override
+                    public void onDone(String data) {
+                        Log.d("bootpay done", data);
+//                        BootpayBio.removePaymentWindow();
+                    }
+                })
+                .requestPayment();
     }
 }
