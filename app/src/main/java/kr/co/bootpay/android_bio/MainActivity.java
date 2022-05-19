@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
                 .setApplicationId(applicationId)
                 .setOrderName("bootpay test")
                 .setUserToken(easyUserToken)
-                .setPrice(50000.0) //최종 결제 금액
+                .setPrice(1000.0) //최종 결제 금액
                 .setOrderId(String.valueOf(System.currentTimeMillis())) //개발사에서 관리하는 주문번호
                 .setUser(user)
                 .setExtra(extra)
@@ -94,31 +94,30 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
                 .setEventListener(new BootpayEventListener() {
                     @Override
                     public void onCancel(String data) {
-                        Log.d("bootpay cancel", data);
+                        Log.d("-- bootpay cancel", data);
                     }
 
                     @Override
                     public void onError(String data) {
-                        Log.d("bootpay error", data);
-//                        BootpayBio.removePaymentWindow();
+                        Log.d("-- bootpay error", data);
                     }
 
                     @Override
                     public void onClose(String data) {
-                        Log.d("bootpay close", data);
+                        Log.d("-- bootpay close", data);
                         BootpayBio.removePaymentWindow();
                     }
 
                     @Override
                     public void onIssued(String data) {
-                        Log.d("bootpay issued", data);
+                        Log.d("-- bootpay issued", data);
 
                     }
 
 
                     @Override
                     public boolean onConfirm(String data) {
-                        Log.d("bootpay confirm", data);
+                        Log.d("-- bootpay confirm", data);
 //                        return false; //재고 없으면 return false
 //                        BootpayBio.transactionConfirm(data);
                         return true; // 재고 있으면 return true
@@ -126,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
 
                     @Override
                     public void onDone(String data) {
-                        Log.d("bootpay done", data);
+                        Log.d("-- bootpay done", data);
 //                        BootpayBio.removePaymentWindow();
                     }
                 })

@@ -1,11 +1,13 @@
 package kr.co.bootpay.core.activity;
 
+import static android.hardware.biometrics.BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE;
 import static androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -467,11 +469,31 @@ public class BootpayBioActivity extends FragmentActivity  {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                if(BiometricManager.from(context).canAuthenticate() == BIOMETRIC_SUCCESS) {
-                    biometricPrompt.authenticate(promptInfo);
-                }  else {
-                    Toast.makeText(context, "생체인증 정보가 등록되지 않은 기기입니다.", Toast.LENGTH_SHORT).show();
+
+                switch (BiometricManager.from(context).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
+                    case BIOMETRIC_SUCCESS: {
+                        biometricPrompt.authenticate(promptInfo);
+                    }
+                    break;
+                    case BIOMETRIC_ERROR_NO_HARDWARE: {
+                        Toast.makeText(context, "생체인증 정보가 등록되지 않은 기기입니다. 비밀번호 인증 방식으로 진행합니다.", Toast.LENGTH_SHORT).show();
+
+                        presenter.setRequestType(BioConstants.REQUEST_PASSWORD_FOR_PAY);
+                        presenter.requestPasswordForPay();
+                    }
+                    break;
+                    default: {
+                        Toast.makeText(context, "생체인증 정보가 등록되지 않은 기기입니다.", Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+
+
                 }
+//                if(BiometricManager.from(context).canAuthenticate() == BIOMETRIC_SUCCESS) {
+//                    biometricPrompt.authenticate(promptInfo);
+//                }  else {
+//                    Toast.makeText(context, "생체인증 정보가 등록되지 않은 기기입니다.", Toast.LENGTH_SHORT).show();
+//                }
             }
         });
     }

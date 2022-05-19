@@ -1,5 +1,7 @@
 package kr.co.bootpay.core.constants;
 
+import static kr.co.bootpay.android.constants.BootpayBuildConfig.VERSION;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -10,6 +12,7 @@ import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import kr.co.bootpay.android.constants.BootpayBuildConfig;
 import kr.co.bootpay.core.helper.SharedPreferenceHelper;
 import kr.co.bootpay.core.memory.CurrentBioRequest;
 import kr.co.bootpay.core.models.BioPayload;
@@ -250,29 +253,31 @@ public class BioConstants extends BootpayConstant {
     }
 
 
-    public static String confirm() { return "if (res.event === 'confirm') { Android.confirm(JSON.stringify(res)); }"; }
+    public static String confirm() { return "if (res.event === 'confirm') { " + BootpayBuildConfig.JSInterfaceBridgeName + ".confirm(JSON.stringify(res)); }"; }
 
-    public static String done()  { return "else if (res.event === 'done') { Android.done(JSON.stringify(res)); }"; }
+    public static String done()  { return "else if (res.event === 'done') { " + BootpayBuildConfig.JSInterfaceBridgeName + ".done(JSON.stringify(res)); }"; }
 
-    public static String issued() { return "else if (res.event === 'issued') { Android.issued(JSON.stringify(res)); }"; }
+    public static String issued() { return "else if (res.event === 'issued') { " + BootpayBuildConfig.JSInterfaceBridgeName + ".issued(JSON.stringify(res)); }"; }
 
-    public static String error() { return "if (res.event === 'error') { Android.error(JSON.stringify(res)); }"; }
+    public static String error() { return "if (res.event === 'error') { " + BootpayBuildConfig.JSInterfaceBridgeName + ".error(JSON.stringify(res)); }"; }
 
-    public static String cancel() { return  "if (res.event === 'cancel') { Android.cancel(JSON.stringify(res)); }"; }
+    public static String cancel() { return  "if (res.event === 'cancel') { " + BootpayBuildConfig.JSInterfaceBridgeName + ".cancel(JSON.stringify(res)); }"; }
 
     public static String close() { return  "document.addEventListener('bootpayclose', function (e) { Android.close('결제창이 닫혔습니다'); });"; }
 
     public static final List<String> getJSBeforePayStart(String uuid) {
         List<String> scripts = new ArrayList<>();
-        scripts.add(close());
+        scripts.add("Bootpay.setVersion('" + VERSION + "', 'android');");
+        scripts.add("BootpaySDK.setDevice('ANDROID');");
+
         if(BioBuildConfig.DEBUG) {
             scripts.add("Bootpay.setEnvironmentMode('development', 'gosomi.bootpay.co.kr');");
             scripts.add("BootpaySDK.setEnvironmentMode('development', 'gosomi.bootpay.co.kr');");
         }
         scripts.add("Bootpay.setDevice('ANDROID');");
         scripts.add("Bootpay.setLogLevel(4);");
-        scripts.add("BootpaySDK.setDevice('ANDROID');");
         scripts.add("BootpaySDK.setUUID('" + uuid + "');");
+        scripts.add(close());
 
 //        scripts.add(getAnalyticsData(context));
 //        if(quickPopup) scripts.add("BootPay.startQuickPopup();");

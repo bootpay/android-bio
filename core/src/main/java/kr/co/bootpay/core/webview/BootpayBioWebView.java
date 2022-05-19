@@ -16,6 +16,9 @@ import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
@@ -37,8 +40,8 @@ import kr.co.bootpay.android.pref.UserInfo;
 
 
 public class BootpayBioWebView extends WebView implements BootpayInterface {
-    BootpayDialog mDialog;
-    BootpayDialogX mDialogX;
+//    BootpayDialog mDialog;
+//    BootpayDialogX mDialogX;
 
     BootpayBioWebViewClient mWebViewClient;
 //    BioEventListener mEventListener;
@@ -89,7 +92,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
 
     @SuppressLint("JavascriptInterface")
     void payWebSettings(Context context) {
-        addJavascriptInterface(new BootpayJavascriptBridge(), "Android");
+        addJavascriptInterface(new BootpayJavascriptBridge(), BootpayBuildConfig.JSInterfaceBridgeName);
         getSettings().setAppCacheEnabled(true);
         getSettings().setAllowFileAccess(false);
         getSettings().setAllowContentAccess(false);
@@ -123,8 +126,9 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
 
     @Override
     public void removePaymentWindow() {
-        if(mDialog != null) mDialog.removePaymentWindow();
-        else if(mDialogX != null) mDialogX.removePaymentWindow();
+        load("Bootpay.removePaymentWindow();");
+//        if(mDialog != null) mDialog.removePaymentWindow();
+//        else if(mDialogX != null) mDialogX.removePaymentWindow();
     }
 
     public void startBootpay() {
@@ -198,7 +202,6 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public void error(String data) {
-            Log.d("bootpay", "error: " + data);
             //TODO - Password Token init
 //            if (mEventListener != null) mEventListener.onError(data);
             if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onError(data);
@@ -207,7 +210,6 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public void close(String data) {
-            Log.d("bootpay", "close: " + data + ", reqeustType: " + CurrentBioRequest.getInstance().requestType);
 
             if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_ADD_CARD ||
             CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY ||
@@ -230,14 +232,12 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public void cancel(String data) {
-            Log.d("bootpay", "cancel: " + data);
             CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
             if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onCancel(data);
         }
 
         @Override
         public void issued(String data) {
-            Log.d("bootpay", "issued: " + data);
             CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
             if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onIssued(data);
         }
@@ -253,7 +253,6 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public String confirm(String data) {
-            Log.d("bootpay", "confirm: " + data);
             boolean goTransaction = false;
 //            if (mEventListener != null) goTransaction = mEventListener.onConfirm(data);
             if(CurrentBioRequest.getInstance().listener != null) goTransaction = CurrentBioRequest.getInstance().listener.onConfirm(data);
@@ -264,13 +263,61 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public void done(String data) {
-            Log.d("bootpay", "done: " + data);
 //            NextJob job = new NextJob();
 //            job.initToken = true;
 //            if (CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
             if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onDone(data);
         }
 
+        @JavascriptInterface
+        @Override
+        public void redirectEvent(String data) {
+            Log.d("bootpay", "redirectEvent: " + data);
+            if("undefined".equals(data)) return;
+            try {
+                JSONObject json = new JSONObject(data);
+                String event = String.valueOf(json.get("event"));
+                switch (event) {
+                    case "error":
+                        error(data);
+                        if(!isDisplayError()) close(data);
+                        break;
+                    case "close":
+                        close(data);
+                        break;
+                    case "cancel":
+                        cancel(data);
+                        close(data);
+                        break;
+                    case "issued":
+                        issued(data);
+                        if(!isDisplaySuccess()) close(data);
+                        break;
+                    case "confirm":
+                        confirm(data);
+                        break;
+                    case "done":
+                        done(data);
+                        if(!isDisplaySuccess()) close(data);
+                        break;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        boolean isDisplaySuccess() {
+            if(payload == null) return false;
+            if(payload.getExtra() == null) return false;
+            return payload.getExtra().isDisplaySuccessResult();
+        }
+
+        boolean isDisplayError() {
+            if(payload == null) return false;
+            if(payload.getExtra() == null) return false;
+            return payload.getExtra().isDisplayErrorResult();
+        }
 
 //        @JavascriptInterface
 //        @Override
@@ -368,8 +415,8 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
 
     public void backPressed() {
         if(canGoBack()) goBack();
-        else if(mDialog != null) mDialog.dismiss();
-        else if(mDialogX != null) mDialogX.dismiss();
+//        else if(mDialog != null) mDialog.dismiss();
+//        else if(mDialogX != null) mDialogX.dismiss();
     }
 
     void evaluateJavascriptWithFallback(String script) {
