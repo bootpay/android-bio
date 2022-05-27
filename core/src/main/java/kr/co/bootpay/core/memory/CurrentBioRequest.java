@@ -18,6 +18,7 @@ public class CurrentBioRequest {
 
     public BioPayload bioPayload;
     public int requestType = BioConstants.REQUEST_TYPE_NONE;
+    public boolean isPasswordMode = false; //비밀번호 간편결제 호출인지
     public String token;
     public String otp;
     public boolean isCDNLoaded = false;

@@ -305,7 +305,9 @@ public class BootpayBioPresenter implements NextJobInterface {
                 addNewCard();
             } else if(data.nextType == BioConstants.NEXT_JOB_ADD_DELETE_CARD) {
                 requestDeleteCard();
-            } else if(data.nextType == BioConstants.NEXT_JOB_GET_WALLET_LIST) {
+            } else if(data.nextType == BioConstants.REQUEST_PASSWORD_FOR_PAY) {
+               requestPasswordForPay();
+            }  else if(data.nextType == BioConstants.NEXT_JOB_GET_WALLET_LIST) {
                 if(data.type == BioConstants.REQUEST_ADD_BIOMETRIC_FOR_PAY) {
                     getWalletList(true);
                 } else {
@@ -342,8 +344,12 @@ public class BootpayBioPresenter implements NextJobInterface {
 
     private void startPayWithSelectedCard() {
         Log.d("bootpay", "selectedCardIndex: " + CurrentBioRequest.getInstance().selectedCardIndex);
-
         this.bioPayload.setWalletId(walletList.wallets.get(CurrentBioRequest.getInstance().selectedCardIndex).wallet_id);
+
+        if(CurrentBioRequest.getInstance().isPasswordMode) {
+            requestPasswordForPay();
+            return;
+        }
 
         setRequestType(BioConstants.REQUEST_BIO_FOR_PAY);
         if(!isAblePasswordToken()) {

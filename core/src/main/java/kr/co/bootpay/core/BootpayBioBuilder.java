@@ -47,7 +47,7 @@ public class BootpayBioBuilder {
         return this;
     }
 
-    public void requestPayment() {
+    public void requestBio() {
         long current = System.currentTimeMillis();
         if (current - CurrentBioRequest.getInstance().startWindowTime > 2000) {
             CurrentBioRequest.getInstance().startWindowTime = current;
@@ -55,10 +55,27 @@ public class BootpayBioBuilder {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
+                    CurrentBioRequest.getInstance().isPasswordMode = false;
                     requestBioActivity();
                 }
             });
         }
+    }
+
+    public void requestPassword() {
+        long current = System.currentTimeMillis();
+        if (current - CurrentBioRequest.getInstance().startWindowTime > 2000) {
+            CurrentBioRequest.getInstance().startWindowTime = current;
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    CurrentBioRequest.getInstance().isPasswordMode = true;
+                    requestBioActivity();
+                }
+            });
+        }
+
     }
 
     void requestBioActivity() {

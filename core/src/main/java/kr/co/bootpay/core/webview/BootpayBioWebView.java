@@ -210,6 +210,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public void close(String data) {
+            Log.d("bootpay", "close: " + data);
 
             if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_ADD_CARD ||
             CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY ||
@@ -218,7 +219,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
             CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_ADD_CARD ||
 //            CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_BIO_FOR_PAY ||
             CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_ADD_BIOMETRIC_FOR_PAY) {
-                NextJob job = getNextJob();
+                NextJob job = getNextJob(data);
                 if (CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
             } else {
 //                NextJob job = new NextJob();
@@ -232,12 +233,16 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public void cancel(String data) {
+            Log.d("bootpay", "cancel: " + data);
+
             CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
             if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onCancel(data);
         }
 
         @Override
         public void issued(String data) {
+            Log.d("bootpay", "issued: " + data);
+
             CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
             if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onIssued(data);
         }
@@ -253,6 +258,8 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public String confirm(String data) {
+            Log.d("bootpay", "confirm: " + data);
+
             boolean goTransaction = false;
 //            if (mEventListener != null) goTransaction = mEventListener.onConfirm(data);
             if(CurrentBioRequest.getInstance().listener != null) goTransaction = CurrentBioRequest.getInstance().listener.onConfirm(data);
@@ -263,6 +270,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public void done(String data) {
+            Log.d("bootpay", "done: " + data);
 //            NextJob job = new NextJob();
 //            job.initToken = true;
 //            if (CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
@@ -276,6 +284,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
             if("undefined".equals(data)) return;
             try {
                 JSONObject json = new JSONObject(data);
+                if(json.get("event") == null) return;
                 String event = String.valueOf(json.get("event"));
                 switch (event) {
                     case "error":
@@ -336,15 +345,33 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @Override
         public void easyError(String data) {
             Log.d("bootpay", "easyError: " + data);
+
+
+            try {
+                JSONObject json = new JSONObject(data);
+                if(json.get("error_code") == null) return;
+                String error_code = String.valueOf(json.get("error_code"));
+                if("USER_PW_TOKEN_NOT_FOUND".equals(error_code) || "USER_PW_TOKEN_EXPIRED".equals(error_code)) {
+
+                    NextJob job = new NextJob();
+                    job.initToken = true;
+                    job.nextType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
+                    if(CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
+                } else {
+                    CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
+                    if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onError(data);
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
             NextJob job = new NextJob();
             job.initToken = true;
             if (CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
 
             CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
-//            if (mEventListener != null) mEventListener.onEasyError(data);
             if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onError(data);
-//            if()
-
         }
 
         @JavascriptInterface
@@ -354,10 +381,12 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
             if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN ||
                     CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_ADD_CARD ||
                     CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_DELETE_CARD ||
-                    CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY) {
+                    CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY ||
+                    CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_PASSWORD_FOR_PAY
+            ) {
                 NextJob job = new NextJob();
                 job.type = CurrentBioRequest.getInstance().requestType;
-                job.token = data;
+                job.token = data.replaceAll("\"", "");
                 if(CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
             } else if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_ADD_BIOMETRIC_FOR_PAY) {
                 ResBiometric biometric = new Gson().fromJson(data, ResBiometric.class);
@@ -388,7 +417,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
     }
 
     @NonNull
-    private NextJob getNextJob() {
+    private NextJob getNextJob(String data) {
         NextJob job = new NextJob();
         job.type = CurrentBioRequest.getInstance().requestType;
 
@@ -404,6 +433,9 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
             job.nextType = BioConstants.NEXT_JOB_GET_WALLET_LIST;
         } else if (CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_PASSWORD_FOR_PAY) {
             job.nextType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
+            if(!"결제창이 닫혔습니다".equals(data)) {
+                job.token = data;
+            }
         }
         return job;
     }
@@ -453,6 +485,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN ||
                 CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_ADD_CARD ||
                 CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY ||
+                CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_PASSWORD_FOR_PAY ||
                 CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_DELETE_CARD) {
             callJavaScript(BioConstants.getJSPasswordToken(payload));
         } else if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_FOR_PAY) {

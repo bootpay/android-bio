@@ -1,6 +1,9 @@
 # Bootpay Android-Bio
 
-부트페이 생체인증 결제를 위한 안드로이드 라이브러리로, 안드로이드 API 23이상 부터 사용가능합니다.  
+부트페이 생체인증 결제, 비밀번호 간편결제를 위한 안드로이드 라이브러리로, 안드로이드 API 23이상 부터 사용가능합니다.  
+
+![bootpay_bio_400](https://raw.githubusercontent.com/bootpay/git-open-resources/main/ios_bio.gif)
+![bootpay_bio_400](https://raw.githubusercontent.com/bootpay/git-open-resources/main/ios_password.gif)
 
 ### Gradle을 통한 설치
 

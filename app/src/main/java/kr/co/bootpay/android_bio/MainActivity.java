@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
     String privateKey = "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw="; //production
 //    String privateKey = "sfilSOSVakw+PZA+PRux4Iuwm7a//9CXXudCq9TMDHk="; //developement
 
+    boolean isPasswordMode = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,8 +40,12 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
     }
 
     public void goBioPay(View v) {
+        isPasswordMode = false;
+        BootpayRest.getRestToken(this, this, restApplicationId, privateKey);
+    }
 
-
+    public void goPasswordPay(View v) {
+        isPasswordMode = true;
         BootpayRest.getRestToken(this, this, restApplicationId, privateKey);
     }
 
@@ -72,8 +78,6 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
         BootExtra extra = new BootExtra().setCardQuota("6");
 
         BioPayload bioPayload = new BioPayload();
-//        bioPayload.set
-//        bioPayload.set
 
         bioPayload.setPg("nicepay")
                 .setApplicationId(applicationId)
@@ -88,6 +92,60 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
                 .setPrices(Arrays.asList(new BioPrice("상품가격", 89000.0),  //결제창에 나타날 가격목록
                         new BioPrice("쿠폰적용", -25000.0),
                         new BioPrice("배송비", 2500.0)));
+
+        if(isPasswordMode == false) {
+            requestBio(bioPayload);
+        } else {
+            requestPassword(bioPayload);
+        }
+
+    }
+
+    private void requestBio(BioPayload bioPayload) {
+        BootpayBio.init(this)
+                .setBioPayload(bioPayload)
+                .setEventListener(new BootpayEventListener() {
+                    @Override
+                    public void onCancel(String data) {
+                        Log.d("-- bootpay cancel", data);
+                    }
+
+                    @Override
+                    public void onError(String data) {
+                        Log.d("-- bootpay error", data);
+                    }
+
+                    @Override
+                    public void onClose(String data) {
+                        Log.d("-- bootpay close", data);
+                        BootpayBio.removePaymentWindow();
+                    }
+
+                    @Override
+                    public void onIssued(String data) {
+                        Log.d("-- bootpay issued", data);
+
+                    }
+
+
+                    @Override
+                    public boolean onConfirm(String data) {
+                        Log.d("-- bootpay confirm", data);
+//                        return false; //재고 없으면 return false
+//                        BootpayBio.transactionConfirm(data);
+                        return true; // 재고 있으면 return true
+                    }
+
+                    @Override
+                    public void onDone(String data) {
+                        Log.d("-- bootpay done", data);
+//                        BootpayBio.removePaymentWindow();
+                    }
+                })
+                .requestBio();
+    }
+
+    private void requestPassword(BioPayload bioPayload) {
 
         BootpayBio.init(this)
                 .setBioPayload(bioPayload)
@@ -129,6 +187,6 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
 //                        BootpayBio.removePaymentWindow();
                     }
                 })
-                .requestPayment();
+                .requestPassword();
     }
 }
