@@ -89,12 +89,14 @@ public class BootpayBioBuilder {
             case BIOMETRIC_SUCCESS: {
                 CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
                 Intent intent = new Intent(mContext, BootpayBioActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 mContext.startActivity(intent);
             }
             break;
             case BIOMETRIC_ERROR_NO_HARDWARE: {
                 CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
                 Intent intent = new Intent(mContext, BootpayBioActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 mContext.startActivity(intent);
             }
             break;
