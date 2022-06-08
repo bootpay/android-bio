@@ -2,13 +2,13 @@ package kr.co.bootpay.bio.memory;
 
 import java.util.List;
 
-import kr.co.bootpay.bio.api.NextJobInterface;
+import kr.co.bootpay.android.events.BootpayEventListener;
 import kr.co.bootpay.bio.activity.BootpayBioActivity;
+import kr.co.bootpay.bio.api.NextJobInterface;
 import kr.co.bootpay.bio.constants.BioConstants;
 import kr.co.bootpay.bio.models.BioDevice;
 import kr.co.bootpay.bio.models.BioPayload;
 import kr.co.bootpay.bio.models.data.WalletData;
-import kr.co.bootpay.android.events.BootpayEventListener;
 
 public class CurrentBioRequest {
     private static CurrentBioRequest instance = null;

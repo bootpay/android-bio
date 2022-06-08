@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("kr.co.bootpay.core.test", appContext.getPackageName());
+        assertEquals("kr.co.bootpay.bio", appContext.getPackageName());
     }
 }

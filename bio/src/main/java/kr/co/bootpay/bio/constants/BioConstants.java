@@ -13,14 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kr.co.bootpay.android.constants.BootpayBuildConfig;
+import kr.co.bootpay.android.constants.BootpayConstant;
+import kr.co.bootpay.android.models.BootExtra;
 import kr.co.bootpay.bio.helper.SharedPreferenceHelper;
 import kr.co.bootpay.bio.memory.CurrentBioRequest;
 import kr.co.bootpay.bio.models.BioPayload;
 import kr.co.bootpay.bio.models.BiometricAuthenticate;
 import kr.co.bootpay.bio.models.DestroyWallet;
 import kr.co.bootpay.bio.models.OTPPayload;
-import kr.co.bootpay.android.constants.BootpayConstant;
-import kr.co.bootpay.android.models.BootExtra;
 
 public class BioConstants extends BootpayConstant {
 

@@ -7,7 +7,6 @@ import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import kr.co.bootpay.android.models.BootExtra;
 import kr.co.bootpay.android.models.BootItem;
 import kr.co.bootpay.android.models.BootUser;

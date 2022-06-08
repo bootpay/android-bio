@@ -13,8 +13,8 @@ import androidx.annotation.Nullable;
 
 import java.util.List;
 
-import kr.co.bootpay.bio.memory.CurrentBioRequest;
 import kr.co.bootpay.android.webview.BootpayUrlHelper;
+import kr.co.bootpay.bio.memory.CurrentBioRequest;
 
 public class BootpayBioWebViewClient extends WebViewClient {
 

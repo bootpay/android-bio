@@ -24,17 +24,17 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Locale;
 
+import kr.co.bootpay.android.api.BootpayInterface;
+import kr.co.bootpay.android.constants.BootpayBuildConfig;
+import kr.co.bootpay.android.constants.BootpayConstant;
+import kr.co.bootpay.android.pref.UserInfo;
+import kr.co.bootpay.bio.BootpayBio;
+import kr.co.bootpay.bio.constants.BioConstants;
 import kr.co.bootpay.bio.event.JSBioInterfaceBridge;
 import kr.co.bootpay.bio.memory.CurrentBioRequest;
 import kr.co.bootpay.bio.models.BioPayload;
 import kr.co.bootpay.bio.models.NextJob;
 import kr.co.bootpay.bio.models.ResBiometric;
-import kr.co.bootpay.bio.BootpayBio;
-import kr.co.bootpay.bio.constants.BioConstants;
-import kr.co.bootpay.android.api.BootpayInterface;
-import kr.co.bootpay.android.constants.BootpayBuildConfig;
-import kr.co.bootpay.android.constants.BootpayConstant;
-import kr.co.bootpay.android.pref.UserInfo;
 
 
 public class BootpayBioWebView extends WebView implements BootpayInterface {

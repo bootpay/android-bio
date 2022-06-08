@@ -1,6 +1,6 @@
 package kr.co.bootpay.bio.constants;
 
-import kr.co.bootpay.core.R;
+import kr.co.bootpay.bio.R;
 
 public class CardCode {
     public static final String BC = "01"; //BC카드

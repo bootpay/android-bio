@@ -41,6 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import kr.co.bootpay.bio.R;
+import kr.co.bootpay.bio.constants.BioConstants;
 import kr.co.bootpay.bio.helper.DPHelper;
 import kr.co.bootpay.bio.memory.CurrentBioRequest;
 import kr.co.bootpay.bio.models.BioPayload;
@@ -51,8 +53,6 @@ import kr.co.bootpay.bio.models.data.CardViewPager;
 import kr.co.bootpay.bio.models.data.WalletData;
 import kr.co.bootpay.bio.presenter.BootpayBioPresenter;
 import kr.co.bootpay.bio.webview.BootpayBioWebView;
-import kr.co.bootpay.core.R;
-import kr.co.bootpay.bio.constants.BioConstants;
 
 
 public class BootpayBioActivity extends FragmentActivity  {

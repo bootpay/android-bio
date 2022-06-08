@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="kr.co.bootpay.core">
+    package="kr.co.bootpay.bio">
 
 
     <application
@@ -90,4 +90,5 @@
         <package android:name="kr.danal.app.damoum" /> <!-- 다모음 -->
         <package android:name="uplus.membership" /> <!-- U+ 멤버스 -->
     </queries>
+
 </manifest>

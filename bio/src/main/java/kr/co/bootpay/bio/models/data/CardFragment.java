@@ -11,9 +11,9 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
+import kr.co.bootpay.bio.R;
 import kr.co.bootpay.bio.constants.CardCode;
 import kr.co.bootpay.bio.presenter.BootpayBioPresenter;
-import kr.co.bootpay.core.R;
 
 public class CardFragment extends Fragment {
 //    BioWallet bioWallet;
