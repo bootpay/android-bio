@@ -160,6 +160,11 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         requestScript();
     }
 
+
+    public void stopProgressDialog() {
+        CurrentBioRequest.getInstance().activity.showProgressBar(false);
+    }
+
     public void requestPasswordForPay(String token, BioPayload payload) {
 //        Log.d("bootpay", "requestPasswordForPay");
         CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
@@ -200,15 +205,22 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public void error(String data) {
+            stopProgressDialog();
             //TODO - Password Token init
 //            if (mEventListener != null) mEventListener.onError(data);
             if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onError(data);
+
+            if(CurrentBioRequest.getInstance().bioPayload.getExtra().isDisplayErrorResult() != true) {
+                if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onClose(data);
+
+            }
         }
 
         @JavascriptInterface
         @Override
         public void close(String data) {
-            Log.d("bootpay", "close: " + data);
+            stopProgressDialog();
+            Log.d("bootpay 1", "close 2: " + data);
 
             if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_ADD_CARD ||
             CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY ||
@@ -217,20 +229,49 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
             CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_ADD_CARD ||
 //            CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_BIO_FOR_PAY ||
             CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_ADD_BIOMETRIC_FOR_PAY) {
+//                NextJob job = getNextJob(data);
+//                if (CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
+
                 NextJob job = getNextJob(data);
+                if(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY == CurrentBioRequest.getInstance().requestType) {
+                    job.nextType = BioConstants.NEXT_JOB_RETRY_PAY;
+                } else if(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_ADD_CARD == CurrentBioRequest.getInstance().requestType) {
+                    job.nextType = BioConstants.NEXT_JOB_ADD_NEW_CARD;
+                } else if(BioConstants.REQUEST_PASSWORD_TOKEN_DELETE_CARD == CurrentBioRequest.getInstance().requestType) {
+                    job.nextType = BioConstants.NEXT_JOB_ADD_DELETE_CARD;
+                } else if(BioConstants.REQUEST_ADD_CARD == CurrentBioRequest.getInstance().requestType) {
+                    job.nextType = BioConstants.NEXT_JOB_GET_WALLET_LIST;
+                } else if(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_PASSWORD_FOR_PAY == CurrentBioRequest.getInstance().requestType) {
+                    job.nextType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
+
+                    try {
+                        JSONObject json = null;
+                        json = new JSONObject(data);
+                        if(!"결제창이 닫혔습니다".equals( json.get("message"))) {
+                            job.token = json.getString("message");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
                 if (CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
+
             } else {
 //                NextJob job = new NextJob();
 //                job.initToken = true;
 //                if (CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
-                if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onClose(data);
 
+                if(BioConstants.REQUEST_BIO_FOR_PAY != CurrentBioRequest.getInstance().requestType) {
+                    if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onClose(data);
+                }
             }
         }
 
         @JavascriptInterface
         @Override
         public void cancel(String data) {
+            stopProgressDialog();
+
             Log.d("bootpay", "cancel: " + data);
 
             CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
@@ -239,6 +280,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
 
         @Override
         public void issued(String data) {
+            stopProgressDialog();
             Log.d("bootpay", "issued: " + data);
 
             CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
@@ -256,6 +298,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public String confirm(String data) {
+            stopProgressDialog();
             Log.d("bootpay", "confirm: " + data);
 
             boolean goTransaction = false;
@@ -268,6 +311,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
         @JavascriptInterface
         @Override
         public void done(String data) {
+            stopProgressDialog();
             Log.d("bootpay", "done: " + data);
 //            NextJob job = new NextJob();
 //            job.initToken = true;
@@ -355,21 +399,28 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
                     job.initToken = true;
                     job.nextType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
                     if(CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
-                } else {
+                    return;
+                }
+//                else if("PASSWORD_TOKEN_STOP".equals(error_code) || "PASSWORD_TOKEN_STOP".equals(error_code)) {
+//
+//                }
+                else {
                     CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
                     if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onError(data);
+
+
+//                    NextJob job = new NextJob();
+//                    job.initToken = true;
+//                    if (CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
+//
+//                    CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
+//                    if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onError(data);
 
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            NextJob job = new NextJob();
-            job.initToken = true;
-            if (CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
-
-            CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
-            if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onError(data);
         }
 
         @JavascriptInterface

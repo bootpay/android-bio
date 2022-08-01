@@ -38,4 +38,5 @@
     <color name="font_color_option">#b3b3b3</color>
     <color name="font_color_info">#666666</color>
     <color name="card_pager_bg">#ededed</color>
+    <color name="black12">#22000000</color>
 </resources>

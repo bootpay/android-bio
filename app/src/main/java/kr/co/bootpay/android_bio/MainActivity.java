@@ -3,10 +3,13 @@ package kr.co.bootpay.android_bio;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import kr.co.bootpay.android_bio.deprecated.BootpayRest;
 import kr.co.bootpay.android_bio.deprecated.BootpayRestImplement;
@@ -55,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
         Log.d("bootpay", token.access_token);
 
 //        String userId = UserInfo.getInstance(this).getBootpayUuid(); // 실제값을 적용하실 때에는, 관리하시는 user_id를 입력해주세요.
-        String userId = "123411aaaaaaaaaaaabd4ss11";
+        String userId = "123411aaaaaaaaaaaabd4ss1123";
 
 
 
@@ -78,6 +81,13 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
         BootExtra extra = new BootExtra().setCardQuota("6");
 
         BioPayload bioPayload = new BioPayload();
+
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("1", "abcdef");
+        map.put("2", "abcdef55");
+        map.put("3", 1234);
+        bioPayload.setMetadata(map);
 
         bioPayload.setPg("nicepay")
                 .setApplicationId(applicationId)
@@ -112,7 +122,13 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
 
                     @Override
                     public void onError(String data) {
+
                         Log.d("-- bootpay error", data);
+
+                        runOnUiThread(() -> {
+                            Toast.makeText(getApplicationContext(), data, Toast.LENGTH_SHORT).show();
+                        });
+
                     }
 
                     @Override

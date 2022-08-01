@@ -5,11 +5,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import kr.co.bootpay.android.models.BootExtra;
 import kr.co.bootpay.android.models.BootItem;
 import kr.co.bootpay.android.models.BootUser;
+import kr.co.bootpay.android.models.Payload;
 
 //import kr.co.bootpay.core.models.BootExtra;
 //import kr.co.bootpay.core.models.BootItem;
@@ -32,7 +35,7 @@ public class BioPayload  {
     private String token;
     private String authenticateType;
     private String userToken;
-    private String metadata;
+    private Map<String, Object> metadata = new HashMap<>();
 
     private BootExtra extra;
     private BootUser user;
@@ -175,11 +178,11 @@ public class BioPayload  {
         return this;
     }
 
-    public String getMetadata() {
+    public Map<String, Object> getMetadata() {
         return metadata;
     }
 
-    public BioPayload setMetadata(String metadata) {
+    public BioPayload setMetadata(Map<String, Object> metadata) {
         this.metadata = metadata;
         return this;
     }

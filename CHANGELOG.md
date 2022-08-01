@@ -1,3 +1,11 @@
+## 4.1.1
+* bootpay 4.2.0 적용
+* js 4.2.0 적용
+* 생체인증 로직 개선 및 버그 수정 
+
+## 4.1.0
+* metadata type 수정 
+
 ## 4.0.9
 * intent new task 적용 
 

@@ -22,6 +22,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,6 +65,7 @@ public class BootpayBioActivity extends FragmentActivity  {
     LinearLayout card_actionsheet_layout;
     LinearLayout card_actionsheet_bottom_layout;
     public BootpayBioWebView bioWebView;
+    RelativeLayout mLayoutProgress;
 
     // data
 //    ResEasyBiometric easyBiometric;
@@ -193,12 +195,22 @@ public class BootpayBioActivity extends FragmentActivity  {
         return result;
     }
 
+    public void showProgressBar(boolean isShow) {
+//        if(mLayoutProgress == null) return;
+//        if(isShow == true && mLayoutProgress.VISIBLE == View.VISIBLE) return;
+//        if(isShow == false && mLayoutProgress.VISIBLE == View.GONE) return;
+        runOnUiThread(() -> {
+            mLayoutProgress.setVisibility(isShow == true ? View.VISIBLE : View.GONE);
+        });
+    }
+
 
     void initView() {
 //        SharedPreferenceHelper.setValue(this, "password_token", "엄한값");
 
         card_layout = findViewById(R.id.card_layout);
         bioWebView = findViewById(R.id.webview);
+        mLayoutProgress = findViewById(R.id.layout_progress);
 
 
         this.presenter = new BootpayBioPresenter(context,this, bioWebView);
@@ -232,16 +244,7 @@ public class BootpayBioActivity extends FragmentActivity  {
                 Log.d("bootpay", "position: " + position);
 //                if(data == null || data.wallets == null || data.wallets.card == null || data.wallets.card.size() <= position) return;
                 CurrentBioRequest.getInstance().selectedCardIndex = position;
-                if(CurrentBioRequest.getInstance().wallets == null) return;
-                int size = CurrentBioRequest.getInstance().wallets.size();
-
-                if(position < size - 2) {
-                    text_bottom.setText("이 카드로 결제합니다");
-                } else if(position == size - 2) {
-                    text_bottom.setText("새로운 카드를 등록합니다");
-                } else {
-                    text_bottom.setText("다른 결제수단으로 결제합니다");
-                }
+                updateButtonTitle();
             }
 
             @Override
@@ -265,6 +268,22 @@ public class BootpayBioActivity extends FragmentActivity  {
         card_pager.setAnimationEnabled(true);
         card_pager.setFadeEnabled(true);
         card_pager.setFadeFactor(0.6f);
+    }
+
+    void updateButtonTitle() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            if(CurrentBioRequest.getInstance().wallets == null) return;
+            int size = CurrentBioRequest.getInstance().wallets.size();
+
+            if(CurrentBioRequest.getInstance().selectedCardIndex < size - 2) {
+                text_bottom.setText("이 카드로 결제합니다");
+            } else if(CurrentBioRequest.getInstance().selectedCardIndex == size - 2) {
+                text_bottom.setText("새로운 카드를 등록합니다");
+            } else {
+                text_bottom.setText("다른 결제수단으로 결제합니다");
+            }
+        });
     }
 
     private void setNameViews() {
@@ -433,6 +452,7 @@ public class BootpayBioActivity extends FragmentActivity  {
 
                 //1. 기기 인증이냐
                 //2. 결제냐
+                showProgressBar(true);
                 if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_ADD_BIOMETRIC) {
                     presenter.requestAddBioData(BioConstants.REQUEST_ADD_BIOMETRIC);
                 } else if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_BIOAUTH_FOR_BIO_FOR_PAY) {
@@ -482,7 +502,10 @@ public class BootpayBioActivity extends FragmentActivity  {
                     }
                     break;
                     default: {
-                        Toast.makeText(context, "생체인증 정보가 등록되지 않은 기기입니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "생체인증 정보가 등록되었는지 알 수 없는 상태입니다. 생체인증을 지원하지 않는 기기일 수 있습니다. 비밀번호 인증 방식으로 진행합니다. " + BiometricManager.from(context).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK), Toast.LENGTH_SHORT).show();
+
+                        presenter.setRequestType(BioConstants.REQUEST_PASSWORD_FOR_PAY);
+                        presenter.requestPasswordForPay();
                     }
                     break;
 
@@ -534,6 +557,7 @@ public class BootpayBioActivity extends FragmentActivity  {
         CurrentBioRequest.getInstance().wallets = walletList;
 
         setCardPager();
+        updateButtonTitle();
 
     }
 

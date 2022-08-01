@@ -57,6 +57,7 @@ public class BootpayBioPresenter implements NextJobInterface {
 
     //ui state
     public void showCardView(List<WalletData> walletList) {
+
         if(bioActivity == null) return;
         if(walletList != null) {
             bioActivity.setWalletList(walletList);
@@ -130,9 +131,7 @@ public class BootpayBioPresenter implements NextJobInterface {
                 try {
                     if(response.isSuccessful()) {
                         walletList = new Gson().fromJson(response.body().string(), ResWalletList.class);
-
                         CurrentBioRequest.getInstance().wallets = walletList.wallets;
-
 
                         if(requestBioPay == true) {
                             requestBioForPay();
@@ -174,10 +173,10 @@ public class BootpayBioPresenter implements NextJobInterface {
     public void addNewCard() {
         setRequestType(BioConstants.REQUEST_ADD_CARD);
         if(!isShowWebView()) showWebView();
-        if(!isAblePasswordToken()) {
-            requestPasswordToken(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_ADD_CARD);
-            return;
-        }
+//        if(!isAblePasswordToken()) {
+//            requestPasswordToken(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_ADD_CARD);
+//            return;
+//        }
         requestAddCard();
     }
 
@@ -233,6 +232,7 @@ public class BootpayBioPresenter implements NextJobInterface {
         String secretKey = SharedPreferenceHelper.getValue(context, "biometric_secret_key");
         int serverUnixTime = walletList.biometric.server_unixtime;
         String otp = getOTPValue(secretKey, serverUnixTime);
+//        bioActivity.showProgressBar(true);
         if(otp != null && otp.length() > 0) bioWebView.requestBioForPay(otp, bioPayload);
     }
 
