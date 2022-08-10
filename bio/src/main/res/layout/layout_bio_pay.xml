@@ -27,8 +27,9 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/layout_card_actionsheet_top"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="50dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
                 android:background="@drawable/corner_top"
@@ -46,14 +47,25 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:textColor="@color/font_color"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:text="NICEPAY"/>
+                    android:text="등록된 결제수단"/>
+
+                <ImageView
+                    android:id="@+id/logo_image"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:visibility="gone"
+                    android:padding="15dp"
+                    android:scaleType="fitCenter"
+                    android:gravity="center" />
 
                 <ImageView
                     android:id="@+id/cancel"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
                     android:src="@drawable/close"
                     android:alpha="0.8"
                     android:scaleType="fitCenter"
@@ -66,6 +78,7 @@
                 android:layout_height="0.5dp"/>
 
             <LinearLayout
+                android:id="@+id/layout_card_order_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
@@ -75,6 +88,7 @@
                 android:orientation="horizontal">
 
                 <TextView
+                    android:id="@+id/order_name_hint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/font_color_info"
@@ -94,6 +108,7 @@
 
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/layout_card_order_sub_names"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/white"
@@ -123,6 +138,7 @@
                 android:orientation="vertical"/>
 
             <View
+                android:id="@+id/view_card_pager_top"
                 android:layout_width="match_parent"
                 android:background="@color/card_pager_bg"
                 android:layout_height="10dp"/>
@@ -132,7 +148,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <kr.co.bootpay.bio.models.data.CardViewPager
+                <kr.co.bootpay.bio.card.CardViewPager
                     android:id="@+id/card_pager"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
@@ -145,6 +161,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
             <View
+                android:id="@+id/view_card_pager_bottom"
                 android:layout_width="match_parent"
                 android:background="@color/card_pager_bg"
                 android:layout_height="10dp"/>

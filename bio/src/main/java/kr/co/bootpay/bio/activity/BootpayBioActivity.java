@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -16,10 +17,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Vibrator;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -35,6 +38,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.shape.CornerFamily;
+import com.google.android.material.shape.MaterialShapeDrawable;
+import com.google.android.material.shape.ShapeAppearanceModel;
 import com.skydoves.powerspinner.PowerSpinnerView;
 
 import java.text.DecimalFormat;
@@ -44,13 +50,14 @@ import java.util.concurrent.Executor;
 
 import kr.co.bootpay.bio.R;
 import kr.co.bootpay.bio.constants.BioConstants;
+import kr.co.bootpay.bio.helper.BioThemeHelper;
 import kr.co.bootpay.bio.helper.DPHelper;
 import kr.co.bootpay.bio.memory.CurrentBioRequest;
 import kr.co.bootpay.bio.models.BioPayload;
 import kr.co.bootpay.bio.models.BioPrice;
 import kr.co.bootpay.bio.models.ResWalletList;
-import kr.co.bootpay.bio.models.data.CardPagerAdapter;
-import kr.co.bootpay.bio.models.data.CardViewPager;
+import kr.co.bootpay.bio.card.CardPagerAdapter;
+import kr.co.bootpay.bio.card.CardViewPager;
 import kr.co.bootpay.bio.models.data.WalletData;
 import kr.co.bootpay.bio.presenter.BootpayBioPresenter;
 import kr.co.bootpay.bio.webview.BootpayBioWebView;
@@ -61,9 +68,24 @@ public class BootpayBioActivity extends FragmentActivity  {
     private Context context;
     private BootpayBioPresenter presenter;
 
-    LinearLayout card_layout;
-    LinearLayout card_actionsheet_layout;
+    //apply biotheme bg color
+    LinearLayout layout_card_actionsheet_top;
+    LinearLayout layout_card_order_name;
+    LinearLayout layout_card_order_sub_names;
+    LinearLayout prices;
+    LinearLayout quota_layout;
     LinearLayout card_actionsheet_bottom_layout;
+    View view_card_pager_top;
+    View view_card_pager_bottom;
+    CardViewPager card_pager;
+    TextView order_name_hint;
+    TextView order_name;
+    ///
+
+    LinearLayout card_layout;
+
+
+    LinearLayout card_actionsheet_layout;
     public BootpayBioWebView bioWebView;
     RelativeLayout mLayoutProgress;
 
@@ -80,16 +102,14 @@ public class BootpayBioActivity extends FragmentActivity  {
 //    HorizontalScrollView scrollView;
     private BioPayload bioPayload;
     TextView pg;
+    ImageView logo_image;
     TextView text_bottom;
-    TextView order_name;
 //    TextView msg;
     LinearLayout names;
-    LinearLayout prices;
+//    LinearLayout prices;
 //    BioWalletData data;
-    CardViewPager card_pager;
     CardPagerAdapter cardPagerAdapter;
     PowerSpinnerView quota_spinner;
-    LinearLayout quota_layout;
 //    View quota_line;
 //    int currentIndex = 0;
 
@@ -135,6 +155,7 @@ public class BootpayBioActivity extends FragmentActivity  {
         initView();
         getWalletList();
         initBiometricAuth();
+        setLogoView();
         setNameViews();
         setPriceViews();
         setQuotaValue();
@@ -209,6 +230,12 @@ public class BootpayBioActivity extends FragmentActivity  {
 //        SharedPreferenceHelper.setValue(this, "password_token", "엄한값");
 
         card_layout = findViewById(R.id.card_layout);
+        layout_card_actionsheet_top = findViewById(R.id.layout_card_actionsheet_top);
+        layout_card_order_name = findViewById(R.id.layout_card_order_name);
+        layout_card_order_sub_names = findViewById(R.id.layout_card_order_sub_names);
+        view_card_pager_top = findViewById(R.id.view_card_pager_top);
+        view_card_pager_bottom = findViewById(R.id.view_card_pager_bottom);
+
         bioWebView = findViewById(R.id.webview);
         mLayoutProgress = findViewById(R.id.layout_progress);
 
@@ -218,9 +245,11 @@ public class BootpayBioActivity extends FragmentActivity  {
 
 //        scrollView = findViewById(R.id.scrollView);
         pg = findViewById(R.id.pg);
+        logo_image = findViewById(R.id.logo_image);
         names = findViewById(R.id.names);
         prices = findViewById(R.id.prices);
         text_bottom = findViewById(R.id.text_bottom);
+        order_name_hint = findViewById(R.id.order_name_hint);
         order_name = findViewById(R.id.order_name);
 //        msg = findViewById(R.id.msg);
         card_pager = findViewById(R.id.card_pager);
@@ -268,6 +297,38 @@ public class BootpayBioActivity extends FragmentActivity  {
         card_pager.setAnimationEnabled(true);
         card_pager.setFadeEnabled(true);
         card_pager.setFadeFactor(0.6f);
+
+
+        setBioThemeBgColor();
+
+
+//                text.setTextColor(getThemeColor(CurrentBioRequest.getInstance().bioThemeData.textColor, R.color.font_color_option));
+    }
+
+    void setBioThemeBgColor() {
+        if(CurrentBioRequest.getInstance().bioThemeData.bgColor != 0) {
+            layout_card_actionsheet_top.setBackground(BioThemeHelper.getShapeRoundColor(this.context, CurrentBioRequest.getInstance().bioThemeData.bgColor, 15, false));
+            layout_card_order_name.setBackgroundColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.bgColor, R.color.white));
+            layout_card_order_sub_names.setBackgroundColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.bgColor, R.color.white));
+            prices.setBackgroundColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.bgColor, R.color.white));
+            quota_layout.setBackgroundColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.bgColor, R.color.white));
+            card_actionsheet_bottom_layout.setBackgroundColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.bgColor, R.color.white));
+        }
+        if(CurrentBioRequest.getInstance().bioThemeData.cardBgColor != 0) {
+            view_card_pager_top.setBackgroundColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.cardBgColor, R.color.card_pager_bg));
+            view_card_pager_bottom.setBackgroundColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.cardBgColor, R.color.card_pager_bg));
+            card_pager.setBackgroundColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.cardBgColor, R.color.card_pager_bg));
+        }
+
+        if(CurrentBioRequest.getInstance().bioThemeData.textColor != 0) {
+            order_name_hint.setTextColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.textColor, R.color.font_color_info));
+            order_name.setTextColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.textColor, R.color.font_color));
+        }
+
+        if(CurrentBioRequest.getInstance().bioThemeData.buttonBgColor != 0) {
+            text_bottom.setBackground(BioThemeHelper.getShapeRoundColor(this.context, CurrentBioRequest.getInstance().bioThemeData.buttonBgColor, 6, true));
+            text_bottom.setTextColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.buttonTextColor, R.color.white));
+        }
     }
 
     void updateButtonTitle() {
@@ -286,6 +347,20 @@ public class BootpayBioActivity extends FragmentActivity  {
         });
     }
 
+    private void setLogoView() {
+        if(CurrentBioRequest.getInstance().bioThemeData.logoImageResource != 0) {
+//            text_bottom.setBackground(BioThemeHelper.getShapeRoundColor(this.context, CurrentBioRequest.getInstance().bioThemeData.buttonBgColor, 6, true));
+//            text_bottom.setTextColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.buttonTextColor, R.color.white));
+            logo_image.setVisibility(View.VISIBLE);
+            logo_image.setImageResource(CurrentBioRequest.getInstance().bioThemeData.logoImageResource);
+            pg.setVisibility(View.GONE);
+        } else {
+            logo_image.setVisibility(View.GONE);
+            pg.setVisibility(View.VISIBLE);
+        }
+
+    }
+
     private void setNameViews() {
         if(bioPayload == null) return;
         if(bioPayload.getNames() == null) return;
@@ -298,9 +373,14 @@ public class BootpayBioActivity extends FragmentActivity  {
         text.setLayoutParams(params);
         text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
         text.setText(TextUtils.join(", ", bioPayload.getNames()));
-        text.setTextColor(getResources().getColor(R.color.font_color_option, null));
+
+//        if(CurrentBioRequest.getInstance().bioThemeData.textColor != 0)
+        text.setTextColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.textColor, R.color.font_color_option));
+
+
         names.addView(text);
     }
+
 
     private void setPriceViews() {
         if(bioPayload == null) return;
@@ -308,7 +388,7 @@ public class BootpayBioActivity extends FragmentActivity  {
             LinearLayout layout = new LinearLayout(context);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             layout.setOrientation(LinearLayout.HORIZONTAL);
-            params.setMargins(0, 0, 0, DPHelper.dp2px(context.getResources(), 10
+            params.setMargins(0, 0, 0, DPHelper.dp2px(context, 10
             ));
             layout.setLayoutParams(params);
 
@@ -319,7 +399,9 @@ public class BootpayBioActivity extends FragmentActivity  {
             left.setLayoutParams(params1);
             left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
             left.setText(bioPrice.getName());
-            left.setTextColor(getResources().getColor(R.color.font_color_info, null));
+//            left.setTextColor(getResources().getColor(R.color.font_color_info, null));
+//            left.setTextColor(getResources().getColor(R.color.font_color_info, null));
+            left.setTextColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.textColor, R.color.font_color_info));
             layout.addView(left);
 
             TextView right = new TextView(context);
@@ -329,7 +411,8 @@ public class BootpayBioActivity extends FragmentActivity  {
 //            right.setTextAlignment(TEXT_ALIGNMENT_TEXT_END);
             right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
             right.setText(getComma(bioPrice.getPrice()));
-            right.setTextColor(getResources().getColor(R.color.font_color, null));
+//            right.setTextColor(getResources().getColor(R.color.font_color, null));
+            right.setTextColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.textColor, R.color.font_color));
             layout.addView(right);
             prices.addView(layout);
         }
@@ -337,7 +420,7 @@ public class BootpayBioActivity extends FragmentActivity  {
         LinearLayout layout = new LinearLayout(context);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         layout.setOrientation(LinearLayout.HORIZONTAL);
-        params.setMargins(0, 0, 0, DPHelper.dp2px(context.getResources(), 5));
+        params.setMargins(0, 0, 0, DPHelper.dp2px(context, 5));
         layout.setLayoutParams(params);
 
 
@@ -346,7 +429,8 @@ public class BootpayBioActivity extends FragmentActivity  {
         left.setLayoutParams(params1);
         left.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
         left.setText("총 결제금액");
-        left.setTextColor(getResources().getColor(R.color.font_color_info, null));
+//        left.setTextColor(getResources().getColor(R.color.font_color_info, null));
+        left.setTextColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.textColor, R.color.font_color_info));
         layout.addView(left);
 
         TextView right = new TextView(context);
@@ -357,7 +441,8 @@ public class BootpayBioActivity extends FragmentActivity  {
         right.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         right.setTypeface(left.getTypeface(), Typeface.BOLD);
         right.setText(getComma(bioPayload.getPrice()));
-        right.setTextColor(getResources().getColor(R.color.blue, null));
+//        right.setTextColor(getResources().getColor(R.color.blue, null));
+        right.setTextColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.priceColor, R.color.blue));
         layout.addView(right);
         prices.addView(layout);
     }
@@ -592,4 +677,34 @@ public class BootpayBioActivity extends FragmentActivity  {
     public void transactionConfirm() {
         if(bioPayload != null) bioWebView.transactionConfirm();
     }
+
+
+//    int getThemeColor(int bioThemeColor, int defaultColor) {
+//        if(bioThemeColor != 0) {
+//            return bioThemeColor;
+//        }
+//        return getResources().getColor(defaultColor, null);
+//    }
+//
+//    float dpToPx(Context context, float dp) {
+//        DisplayMetrics dm = context.getResources().getDisplayMetrics();
+//        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, dm);
+//    }
+//
+//    Drawable getShapeRoundColor(Context context, int color, int dp, boolean isCornerAll) {
+//        ShapeAppearanceModel shapeModel;
+//        ShapeAppearanceModel.Builder builder = ShapeAppearanceModel.builder();
+//        if(isCornerAll) {
+//            shapeModel = builder.setAllCornerSizes(dpToPx(context, dp)).build();
+//        } else {
+//            shapeModel = builder
+//                    .setTopLeftCorner(CornerFamily.ROUNDED, dpToPx(context, dp))
+//                    .setTopRightCorner(CornerFamily.ROUNDED, dpToPx(context, dp))
+//                    .build();
+//        }
+//
+//        MaterialShapeDrawable shape = new MaterialShapeDrawable(shapeModel);
+//        shape.setFillColor(ColorStateList.valueOf(color));
+//        return shape;
+//    }
 }

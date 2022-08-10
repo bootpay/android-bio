@@ -182,12 +182,12 @@ public class BootpayBioPresenter implements NextJobInterface {
 
     public void deleteCard(int index) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AlertDialogStyle);
-        builder.setTitle("결제수단 삭제");
-        builder.setMessage("선택하신 결제수단을 삭제하시겠습니까?");
-        builder.setNegativeButton("취소", (dialog, which) -> {
+        builder.setTitle("카드 삭제");
+        builder.setMessage("등록된 카드를 삭제합니다.\n정말 삭제하시겠습니까?");
+        builder.setNegativeButton("닫기", (dialog, which) -> {
 
         });
-        builder.setPositiveButton("확인", (dialogInterface, i) -> {
+        builder.setPositiveButton("삭제", (dialogInterface, i) -> {
 //            selectedCardIndex = index;
             CurrentBioRequest.getInstance().selectedCardIndex = index;
             bioPayload.setWalletId(walletList.wallets.get(index).wallet_id);
@@ -329,6 +329,7 @@ public class BootpayBioPresenter implements NextJobInterface {
     }
 
     public void goDeleteCard(WalletData data) {
+        if(data.wallet_id == null || data.wallet_id.isEmpty()) return;
         deleteCard(walletList.wallets.indexOf(data));
     }
 

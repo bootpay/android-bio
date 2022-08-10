@@ -1,4 +1,4 @@
-package kr.co.bootpay.bio.models.data;
+package kr.co.bootpay.bio.card;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -7,12 +7,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
 import kr.co.bootpay.bio.R;
 import kr.co.bootpay.bio.constants.CardCode;
+import kr.co.bootpay.bio.helper.BioThemeHelper;
+import kr.co.bootpay.bio.memory.CurrentBioRequest;
+import kr.co.bootpay.bio.models.BioThemeData;
+import kr.co.bootpay.bio.models.data.WalletData;
 import kr.co.bootpay.bio.presenter.BootpayBioPresenter;
 
 public class CardFragment extends Fragment {
@@ -26,6 +31,7 @@ public class CardFragment extends Fragment {
     ImageView card_chip;
     TextView bank_num;
 
+    RelativeLayout icon_card_circle;
     ImageView icon_card;
     TextView text_bottom;
     BootpayBioPresenter presenter;
@@ -48,6 +54,7 @@ public class CardFragment extends Fragment {
         bank_name.setVisibility(walletData.wallet_type == -1 ? View.VISIBLE : View.GONE);
         bank_num.setVisibility(walletData.wallet_type == -1 ? View.VISIBLE : View.GONE);
         card_chip.setVisibility(walletData.wallet_type == -1 ? View.VISIBLE : View.GONE);
+        icon_card_circle.setVisibility(walletData.wallet_type != -1 ? View.VISIBLE : View.GONE);
         icon_card.setVisibility(walletData.wallet_type != -1 ? View.VISIBLE : View.GONE);
         text_bottom.setVisibility(walletData.wallet_type != -1 ? View.VISIBLE : View.GONE);
     }
@@ -58,15 +65,46 @@ public class CardFragment extends Fragment {
         if(walletData.wallet_type == -1) {
             card.setBackground(getResources().getDrawable(R.drawable.rounded_gray, null));
         } else if(walletData.wallet_type == 1) {
-            card.setBackground(getResources().getDrawable(R.drawable.card_new, null));
+//            card.setBackground(getResources().getDrawable(R.drawable.card_new, null));
             text_bottom.setText("새로운 카드 등록");
-            text_bottom.setTextColor(context.getResources().getColor(R.color.blue, null));
-            icon_card.setImageResource(R.drawable.ico_plus);
+
+            if(CurrentBioRequest.getInstance().bioThemeData.card1Color != 0) {
+                card.setBackground(BioThemeHelper.getShapeRoundColor(context, CurrentBioRequest.getInstance().bioThemeData.card1Color, 6, true));
+                icon_card.setColorFilter(CurrentBioRequest.getInstance().bioThemeData.card1Color);
+            } else {
+                card.setBackground(getResources().getDrawable(R.drawable.card_new, null));
+                icon_card.setColorFilter(getResources().getColor(R.color.new_card_bg, null));
+            }
+
+            if(CurrentBioRequest.getInstance().bioThemeData.cardText1Color != 0) {
+                text_bottom.setTextColor(BioThemeHelper.getThemeColor(context, CurrentBioRequest.getInstance().bioThemeData.cardText1Color, R.color.blue));
+                icon_card_circle.setBackground(BioThemeHelper.getShapeRoundColor(context, CurrentBioRequest.getInstance().bioThemeData.cardText1Color, 17.5f, true));
+            } else {
+                text_bottom.setTextColor(context.getResources().getColor(R.color.blue, null));
+            }
+
+            icon_card.setImageResource(R.drawable.ico_plus_outline);
         } else if(walletData.wallet_type == 2) {
-            card.setBackground(getResources().getDrawable(R.drawable.card_other, null));
+//            card.setBackground(getResources().getDrawable(R.drawable.card_other, null));
             text_bottom.setText("다른 결제 수단");
-            text_bottom.setTextColor(context.getResources().getColor(R.color.white, null));
-            icon_card.setImageResource(R.drawable.ico_card);
+
+            if(CurrentBioRequest.getInstance().bioThemeData.card2Color != 0) {
+                card.setBackground(BioThemeHelper.getShapeRoundColor(context, CurrentBioRequest.getInstance().bioThemeData.card2Color, 6, true));
+            } else {
+                card.setBackground(getResources().getDrawable(R.drawable.card_other, null));
+            }
+
+            if(CurrentBioRequest.getInstance().bioThemeData.cardText2Color != 0) {
+                text_bottom.setTextColor(BioThemeHelper.getThemeColor(context, CurrentBioRequest.getInstance().bioThemeData.cardText2Color, R.color.white));
+                icon_card_circle.setBackground(BioThemeHelper.getShapeRoundColor(context, CurrentBioRequest.getInstance().bioThemeData.cardText2Color, 17.5f, true));
+            } else {
+                text_bottom.setTextColor(context.getResources().getColor(R.color.white, null));
+            }
+            if(CurrentBioRequest.getInstance().bioThemeData.cardIconColor != 0) {
+                icon_card.setColorFilter(CurrentBioRequest.getInstance().bioThemeData.cardIconColor);
+            }
+//            text_bottom.setTextColor(context.getResources().getColor(R.color.white, null));
+            icon_card.setImageResource(R.drawable.ico_card_outline);
         }
     }
 
@@ -113,6 +151,7 @@ public class CardFragment extends Fragment {
         bank_name = cardView.findViewById(R.id.bank_name);
         bank_num = cardView.findViewById(R.id.bank_num);
         icon_card = cardView.findViewById(R.id.icon_card);
+        icon_card_circle = cardView.findViewById(R.id.icon_card_circle);
         text_bottom = cardView.findViewById(R.id.text_bottom);
         updateView();
 

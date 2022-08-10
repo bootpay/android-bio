@@ -1,4 +1,4 @@
-package kr.co.bootpay.bio.models.data;
+package kr.co.bootpay.bio.card;
 
 import android.content.Context;
 
@@ -9,6 +9,7 @@ import androidx.viewpager.widget.PagerAdapter;
 
 import java.util.List;
 
+import kr.co.bootpay.bio.models.data.WalletData;
 import kr.co.bootpay.bio.presenter.BootpayBioPresenter;
 
 public class CardPagerAdapter extends FragmentStatePagerAdapter {

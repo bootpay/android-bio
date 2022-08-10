@@ -1,4 +1,4 @@
-package kr.co.bootpay.bio.models.data;
+package kr.co.bootpay.bio.card;
 
 
 import android.content.Context;
@@ -30,7 +30,7 @@ public class CardViewPager extends ViewPager implements ViewPager.PageTransforme
         setOverScrollMode(2);
         setPageTransformer(false, this);
         setOffscreenPageLimit(3);
-        mPageMargin = DPHelper.dp2px(context.getResources(), 40);
+        mPageMargin = DPHelper.dp2px(context, 40);
 //        int verticalPadding = dp2px(context.getResources(), 10);
         setPadding(mPageMargin, 0, mPageMargin, 0);
     }

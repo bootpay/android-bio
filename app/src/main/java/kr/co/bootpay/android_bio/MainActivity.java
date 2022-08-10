@@ -16,11 +16,13 @@ import kr.co.bootpay.android_bio.deprecated.BootpayRestImplement;
 import kr.co.bootpay.android_bio.deprecated.EasyPayUserTokenData;
 import kr.co.bootpay.android_bio.deprecated.TokenData;
 import kr.co.bootpay.bio.BootpayBio;
+import kr.co.bootpay.bio.constants.CardCode;
 import kr.co.bootpay.bio.models.BioPayload;
 import kr.co.bootpay.bio.models.BioPrice;
 import kr.co.bootpay.android.events.BootpayEventListener;
 import kr.co.bootpay.android.models.BootExtra;
 import kr.co.bootpay.android.models.BootUser;
+import kr.co.bootpay.bio.models.BioThemeData;
 
 public class MainActivity extends AppCompatActivity implements BootpayRestImplement {
     String applicationId = "5b8f6a4d396fa665fdc2b5e8"; //production
@@ -112,8 +114,21 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
     }
 
     private void requestBio(BioPayload bioPayload) {
+
+        BioThemeData bioThemeData = new BioThemeData();
+//        bioThemeData.bgColor = getResources().getColor(R.color.bg_color, null);
+//        bioThemeData.textColor = getResources().getColor(R.color.price_color, null);
+//        bioThemeData.priceColor = getResources().getColor(R.color.price_color, null);
+//        bioThemeData.cardText1Color = getResources().getColor(R.color.card1_text_color, null);
+//        bioThemeData.card2Color = getResources().getColor(R.color.card2_color, null);
+//        bioThemeData.cardIconColor = getResources().getColor(R.color.card_icon_color, null);
+//        bioThemeData.buttonBgColor = getResources().getColor(R.color.button_bg_color, null);
+//        bioThemeData.logoImageResource = R.drawable.example_logo;
+
+
         BootpayBio.init(this)
                 .setBioPayload(bioPayload)
+                .setThemeData(bioThemeData)
                 .setEventListener(new BootpayEventListener() {
                     @Override
                     public void onCancel(String data) {

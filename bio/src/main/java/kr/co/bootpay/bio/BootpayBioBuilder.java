@@ -17,11 +17,13 @@ import kr.co.bootpay.bio.activity.BootpayBioActivity;
 import kr.co.bootpay.bio.constants.BioConstants;
 import kr.co.bootpay.bio.memory.CurrentBioRequest;
 import kr.co.bootpay.bio.models.BioPayload;
+import kr.co.bootpay.bio.models.BioThemeData;
 
 public class BootpayBioBuilder {
     private Context mContext;
 
     private BioPayload mPayload;
+    private BioThemeData mBioThemeData;
     private BootpayEventListener mEventListener;
 //    private int requestType = BioConstants.REQUEST_TYPE_NONE;
 
@@ -31,6 +33,11 @@ public class BootpayBioBuilder {
 
     public BootpayBioBuilder setBioPayload(BioPayload payload) {
         this.mPayload = payload;
+        return this;
+    }
+
+    public BootpayBioBuilder setThemeData(BioThemeData themeData) {
+        this.mBioThemeData = themeData;
         return this;
     }
 
@@ -84,10 +91,16 @@ public class BootpayBioBuilder {
         if (mEventListener != null) CurrentBioRequest.getInstance().listener = mEventListener;
 
         CurrentBioRequest.getInstance().bioPayload = mPayload;
+        if(mBioThemeData != null) {
+            CurrentBioRequest.getInstance().bioThemeData = mBioThemeData;
+        }
+
+
 //        CurrentBioRequest.getInstance().activity = null;
 
         switch (BiometricManager.from(mContext).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
-            case BIOMETRIC_SUCCESS: {
+            case BIOMETRIC_SUCCESS:
+            case BIOMETRIC_STATUS_UNKNOWN: {
                 CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
                 Intent intent = new Intent(mContext, BootpayBioActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -96,13 +109,6 @@ public class BootpayBioBuilder {
             break;
             case BIOMETRIC_ERROR_NO_HARDWARE: {
                 CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
-                Intent intent = new Intent(mContext, BootpayBioActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                mContext.startActivity(intent);
-            }
-            break;
-            case BIOMETRIC_STATUS_UNKNOWN:{
-                CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
                 Intent intent = new Intent(mContext, BootpayBioActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 mContext.startActivity(intent);

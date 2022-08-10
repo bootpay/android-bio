@@ -4,7 +4,14 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.4026268115942029" />
+        <entry key="bio/src/main/res/drawable/card_new.xml" value="0.263" />
+        <entry key="bio/src/main/res/drawable/corner_blue.xml" value="0.1" />
+        <entry key="bio/src/main/res/drawable/corner_top.xml" value="0.168" />
+        <entry key="bio/src/main/res/drawable/rounded.xml" value="0.263" />
+        <entry key="bio/src/main/res/drawable/rounded_gray.xml" value="0.263" />
+        <entry key="bio/src/main/res/drawable/rounded_white.xml" value="0.263" />
         <entry key="bio/src/main/res/layout/layout_bio_pay.xml" value="0.23958333333333334" />
+        <entry key="bio/src/main/res/layout/layout_card.xml" value="0.23556231003039513" />
         <entry key="core/src/main/res/layout/layout_bio_pay.xml" value="0.23489583333333333" />
       </map>
     </option>

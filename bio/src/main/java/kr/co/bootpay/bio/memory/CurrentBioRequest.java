@@ -8,6 +8,7 @@ import kr.co.bootpay.bio.api.NextJobInterface;
 import kr.co.bootpay.bio.constants.BioConstants;
 import kr.co.bootpay.bio.models.BioDevice;
 import kr.co.bootpay.bio.models.BioPayload;
+import kr.co.bootpay.bio.models.BioThemeData;
 import kr.co.bootpay.bio.models.data.WalletData;
 
 public class CurrentBioRequest {
@@ -17,6 +18,7 @@ public class CurrentBioRequest {
     public BootpayBioActivity activity;
 
     public BioPayload bioPayload;
+    public BioThemeData bioThemeData;
     public int requestType = BioConstants.REQUEST_TYPE_NONE;
     public boolean isPasswordMode = false; //비밀번호 간편결제 호출인지
     public String token;
@@ -33,8 +35,12 @@ public class CurrentBioRequest {
     public int selectedCardIndex = 0;
     public String selectedQuota = "0";
 
+
     public static CurrentBioRequest getInstance() {
-        if(instance == null) instance = new CurrentBioRequest();
+        if(instance == null) {
+            instance = new CurrentBioRequest();
+            instance.bioThemeData = new BioThemeData();
+        }
         return instance;
     }
 }
