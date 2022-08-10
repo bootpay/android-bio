@@ -306,6 +306,9 @@ public class BootpayBioActivity extends FragmentActivity  {
     }
 
     void setBioThemeBgColor() {
+        layout_card_order_name.setVisibility(CurrentBioRequest.getInstance().isEditMode == true ? View.GONE : View.VISIBLE);
+        prices.setVisibility(CurrentBioRequest.getInstance().isEditMode == true ? View.GONE : View.VISIBLE);
+
         if(CurrentBioRequest.getInstance().bioThemeData.bgColor != 0) {
             layout_card_actionsheet_top.setBackground(BioThemeHelper.getShapeRoundColor(this.context, CurrentBioRequest.getInstance().bioThemeData.bgColor, 15, false));
             layout_card_order_name.setBackgroundColor(BioThemeHelper.getThemeColor(this.context, CurrentBioRequest.getInstance().bioThemeData.bgColor, R.color.white));
@@ -337,13 +340,23 @@ public class BootpayBioActivity extends FragmentActivity  {
             if(CurrentBioRequest.getInstance().wallets == null) return;
             int size = CurrentBioRequest.getInstance().wallets.size();
 
-            if(CurrentBioRequest.getInstance().selectedCardIndex < size - 2) {
-                text_bottom.setText("이 카드로 결제합니다");
-            } else if(CurrentBioRequest.getInstance().selectedCardIndex == size - 2) {
-                text_bottom.setText("새로운 카드를 등록합니다");
+//            if(C)
+            if(CurrentBioRequest.getInstance().isEditMode == true) {
+                if(CurrentBioRequest.getInstance().selectedCardIndex < size - 1) {
+                    text_bottom.setText("이 카드를 편집하기");
+                } else if(CurrentBioRequest.getInstance().selectedCardIndex == size - 2) {
+                    text_bottom.setText("새로운 카드를 등록하기");
+                }
             } else {
-                text_bottom.setText("다른 결제수단으로 결제합니다");
+                if(CurrentBioRequest.getInstance().selectedCardIndex < size - 2) {
+                    text_bottom.setText("이 카드로 결제하기");
+                } else if(CurrentBioRequest.getInstance().selectedCardIndex == size - 2) {
+                    text_bottom.setText("새로운 카드를 등록하기");
+                } else {
+                    text_bottom.setText("다른 결제수단으로 결제하기");
+                }
             }
+
         });
     }
 
@@ -384,6 +397,7 @@ public class BootpayBioActivity extends FragmentActivity  {
 
     private void setPriceViews() {
         if(bioPayload == null) return;
+        if(bioPayload.getPrices() == null) return;
         for(BioPrice bioPrice : bioPayload.getPrices()) {
             LinearLayout layout = new LinearLayout(context);
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -593,8 +607,6 @@ public class BootpayBioActivity extends FragmentActivity  {
                         presenter.requestPasswordForPay();
                     }
                     break;
-
-
                 }
 //                if(BiometricManager.from(context).canAuthenticate() == BIOMETRIC_SUCCESS) {
 //                    biometricPrompt.authenticate(promptInfo);

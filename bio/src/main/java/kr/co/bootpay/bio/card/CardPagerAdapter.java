@@ -9,6 +9,7 @@ import androidx.viewpager.widget.PagerAdapter;
 
 import java.util.List;
 
+import kr.co.bootpay.bio.memory.CurrentBioRequest;
 import kr.co.bootpay.bio.models.data.WalletData;
 import kr.co.bootpay.bio.presenter.BootpayBioPresenter;
 
@@ -36,7 +37,10 @@ public class CardPagerAdapter extends FragmentStatePagerAdapter {
         if(this.data == null) return;
 //        if(this.data.wallets == null) return;
         addWallet(1);
-        addWallet(2);
+
+        if(CurrentBioRequest.getInstance().isEditMode == false) {
+            addWallet(2);
+        }
     }
 
     void addWallet(int walletType) {

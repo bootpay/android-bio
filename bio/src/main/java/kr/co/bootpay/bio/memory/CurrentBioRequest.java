@@ -21,6 +21,7 @@ public class CurrentBioRequest {
     public BioThemeData bioThemeData;
     public int requestType = BioConstants.REQUEST_TYPE_NONE;
     public boolean isPasswordMode = false; //비밀번호 간편결제 호출인지
+    public boolean isEditMode = false; //등록된 결제수단 편집 모드인지
     public String token;
     public String otp;
     public boolean isCDNLoaded = false;

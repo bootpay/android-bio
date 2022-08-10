@@ -23,6 +23,9 @@ public class BootpayBioBuilder {
     private Context mContext;
 
     private BioPayload mPayload;
+    private String userToken;
+
+
     private BioThemeData mBioThemeData;
     private BootpayEventListener mEventListener;
 //    private int requestType = BioConstants.REQUEST_TYPE_NONE;
@@ -33,6 +36,11 @@ public class BootpayBioBuilder {
 
     public BootpayBioBuilder setBioPayload(BioPayload payload) {
         this.mPayload = payload;
+        return this;
+    }
+
+    public BootpayBioBuilder setUserToken(String userToken) {
+        this.userToken = userToken;
         return this;
     }
 
@@ -60,12 +68,10 @@ public class BootpayBioBuilder {
         if (current - CurrentBioRequest.getInstance().startWindowTime > 2000) {
             CurrentBioRequest.getInstance().startWindowTime = current;
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    CurrentBioRequest.getInstance().isPasswordMode = false;
-                    requestBioActivity();
-                }
+            handler.post(() -> {
+                CurrentBioRequest.getInstance().isPasswordMode = false;
+                CurrentBioRequest.getInstance().isEditMode = false;
+                requestBioActivity();
             });
         }
     }
@@ -75,15 +81,28 @@ public class BootpayBioBuilder {
         if (current - CurrentBioRequest.getInstance().startWindowTime > 2000) {
             CurrentBioRequest.getInstance().startWindowTime = current;
             Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    CurrentBioRequest.getInstance().isPasswordMode = true;
-                    requestBioActivity();
-                }
+            handler.post(() -> {
+                CurrentBioRequest.getInstance().isPasswordMode = true;
+                CurrentBioRequest.getInstance().isEditMode = false;
+                requestBioActivity();
             });
         }
+    }
 
+    public void requestEditPayment() {
+        mPayload = new BioPayload();
+        mPayload.setUserToken(userToken);
+
+        long current = System.currentTimeMillis();
+        if (current - CurrentBioRequest.getInstance().startWindowTime > 2000) {
+            CurrentBioRequest.getInstance().startWindowTime = current;
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> {
+                CurrentBioRequest.getInstance().isPasswordMode = false;
+                CurrentBioRequest.getInstance().isEditMode = true;
+                requestBioActivity();
+            });
+        }
     }
 
     void requestBioActivity() {

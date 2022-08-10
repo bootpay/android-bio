@@ -70,10 +70,13 @@ public class CardFragment extends Fragment {
 
             if(CurrentBioRequest.getInstance().bioThemeData.card1Color != 0) {
                 card.setBackground(BioThemeHelper.getShapeRoundColor(context, CurrentBioRequest.getInstance().bioThemeData.card1Color, 6, true));
+//                icon_card_circle.setBackground(BioThemeHelper.getShapeRoundColor(context, CurrentBioRequest.getInstance().bioThemeData.cardText2Color, 17.5f, true));
                 icon_card.setColorFilter(CurrentBioRequest.getInstance().bioThemeData.card1Color);
             } else {
-                card.setBackground(getResources().getDrawable(R.drawable.card_new, null));
-                icon_card.setColorFilter(getResources().getColor(R.color.new_card_bg, null));
+                card.setBackground(BioThemeHelper.getShapeRoundColor(context, context.getResources().getColor(R.color.white, null), 6, true));
+//                icon_card_circle.setBackground(BioThemeHelper.getShapeRoundColor(context, CurrentBioRequest.getInstance().bioThemeData.cardText2Color, 17.5f, true));
+//                card.setBackground(getResources().getDrawable(R.drawable.card_new, null));
+                icon_card.setColorFilter(getResources().getColor(R.color.white, null));
             }
 
             if(CurrentBioRequest.getInstance().bioThemeData.cardText1Color != 0) {
@@ -81,6 +84,7 @@ public class CardFragment extends Fragment {
                 icon_card_circle.setBackground(BioThemeHelper.getShapeRoundColor(context, CurrentBioRequest.getInstance().bioThemeData.cardText1Color, 17.5f, true));
             } else {
                 text_bottom.setTextColor(context.getResources().getColor(R.color.blue, null));
+                icon_card_circle.setBackground(BioThemeHelper.getShapeRoundColor(context, context.getResources().getColor(R.color.blue, null), 17.5f, true));
             }
 
             icon_card.setImageResource(R.drawable.ico_plus_outline);
@@ -102,6 +106,8 @@ public class CardFragment extends Fragment {
             }
             if(CurrentBioRequest.getInstance().bioThemeData.cardIconColor != 0) {
                 icon_card.setColorFilter(CurrentBioRequest.getInstance().bioThemeData.cardIconColor);
+            } else {
+                icon_card.setColorFilter(context.getResources().getColor(R.color.blue, null));
             }
 //            text_bottom.setTextColor(context.getResources().getColor(R.color.white, null));
             icon_card.setImageResource(R.drawable.ico_card_outline);
