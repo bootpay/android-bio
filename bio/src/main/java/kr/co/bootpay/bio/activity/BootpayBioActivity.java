@@ -601,7 +601,7 @@ public class BootpayBioActivity extends FragmentActivity  {
                     }
                     break;
                     default: {
-                        Toast.makeText(context, "생체인증 정보가 등록되었는지 알 수 없는 상태입니다. 생체인증을 지원하지 않는 기기일 수 있습니다. 비밀번호 인증 방식으로 진행합니다. " + BiometricManager.from(context).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(context, "생체인증 정보가 등록되었는지 알 수 없는 상태입니다. 생체인증을 지원하지 않는 기기일 수 있습니다. 비밀번호 인증 방식으로 진행합니다. " + BiometricManager.from(context).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK), Toast.LENGTH_SHORT).show();
 
                         presenter.setRequestType(BioConstants.REQUEST_PASSWORD_FOR_PAY);
                         presenter.requestPasswordForPay();

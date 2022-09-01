@@ -17,6 +17,7 @@ import kr.co.bootpay.android.constants.BootpayConstant;
 import kr.co.bootpay.android.models.BootExtra;
 import kr.co.bootpay.bio.helper.SharedPreferenceHelper;
 import kr.co.bootpay.bio.memory.CurrentBioRequest;
+import kr.co.bootpay.bio.models.BioExtra;
 import kr.co.bootpay.bio.models.BioPayload;
 import kr.co.bootpay.bio.models.BiometricAuthenticate;
 import kr.co.bootpay.bio.models.DestroyWallet;
@@ -101,15 +102,15 @@ public class BioConstants extends BootpayConstant {
             payload.setToken(SharedPreferenceHelper.getValue(context, "password_token"));
         }
         if(payload.getPrice() < 50000) {
-            if(payload.getExtra() == null) payload.setExtra(new BootExtra());
+            if(payload.getExtra() == null) payload.setExtra(new BioExtra());
             payload.getExtra().setCardQuota("0");
         }
 
-        Log.d("bootpay", payload.toJsonUnderscore());
+        Log.d("bootpay", payload.toJsonUnderscoreEasyPay());
 
         return loadParams(
                 "BootpaySDK.requestWalletPayment(",
-                payload.toJsonUnderscore(),
+                payload.toJsonUnderscoreEasyPay(),
                 ")",
                 ".then( function (res) {",
                 easySuccess(),
@@ -124,20 +125,20 @@ public class BioConstants extends BootpayConstant {
     public static String getJSBioOTPPay(BioPayload payload) {
         if(CurrentBioRequest.getInstance().otp != null) payload.setToken(CurrentBioRequest.getInstance().otp);
         payload.setAuthenticateType("otp");
-        if(payload.getExtra() == null) payload.setExtra(new BootExtra());
+        if(payload.getExtra() == null) payload.setExtra(new BioExtra());
         if(payload.getPrice() >= 50000) {
-            BootExtra extra = payload.getExtra();
+            BioExtra extra = payload.getExtra();
             extra.setCardQuota(CurrentBioRequest.getInstance().selectedQuota);
             payload.setExtra(extra);
         } else {
             payload.getExtra().setCardQuota("0");
         }
 
-        Log.d("bootpay", payload.toJsonUnderscore());
+        Log.d("bootpay", payload.toJsonUnderscoreEasyPay());
 
         return loadParams(
                 "BootpaySDK.requestWalletPayment(",
-                payload.toJsonUnderscore(),
+                payload.toJsonUnderscoreEasyPay(),
                 ")",
                 ".then( function (res) {",
                 easySuccess(),

@@ -211,7 +211,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
             if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onError(data);
 
             if(CurrentBioRequest.getInstance().bioPayload.getExtra().isDisplayErrorResult() != true) {
-                if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onClose(data);
+                if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onClose();
 
             }
         }
@@ -262,7 +262,7 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
 //                if (CurrentBioRequest.getInstance().nextJobListener != null) CurrentBioRequest.getInstance().nextJobListener.onNextJob(job);
 
                 if(BioConstants.REQUEST_BIO_FOR_PAY != CurrentBioRequest.getInstance().requestType) {
-                    if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onClose(data);
+                    if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onClose();
                 }
             }
         }
@@ -456,12 +456,15 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
                 if(CurrentBioRequest.getInstance().requestType != BioConstants.REQUEST_ADD_CARD) {
                     CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
                 }
-//                CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
-                if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onDone(data);
-//                if (mEventListener != null) mEventListener.onEasySuccess(data);
+
+                if(CurrentBioRequest.getInstance().listener != null) {
+                    if(CurrentBioRequest.getInstance().bioPayload.getExtra().isSeparatelyConfirmedBio() == true) {
+                        CurrentBioRequest.getInstance().listener.onConfirm(data);
+                    } else {
+                        CurrentBioRequest.getInstance().listener.onDone(data);
+                    }
+                }
             }
-
-
         }
     }
 

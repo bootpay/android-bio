@@ -16,11 +16,10 @@ import kr.co.bootpay.android_bio.deprecated.BootpayRestImplement;
 import kr.co.bootpay.android_bio.deprecated.EasyPayUserTokenData;
 import kr.co.bootpay.android_bio.deprecated.TokenData;
 import kr.co.bootpay.bio.BootpayBio;
-import kr.co.bootpay.bio.constants.CardCode;
+import kr.co.bootpay.bio.models.BioExtra;
 import kr.co.bootpay.bio.models.BioPayload;
 import kr.co.bootpay.bio.models.BioPrice;
 import kr.co.bootpay.android.events.BootpayEventListener;
-import kr.co.bootpay.android.models.BootExtra;
 import kr.co.bootpay.android.models.BootUser;
 import kr.co.bootpay.bio.models.BioThemeData;
 
@@ -89,7 +88,8 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
     public void callbackEasyPayUserToken(EasyPayUserTokenData userToken) {
         String easyUserToken = userToken.user_token; //example. 621ef840ec81b404d7c6fe83
         BootUser user = new BootUser().setPhone("010-1234-5678");
-        BootExtra extra = new BootExtra().setCardQuota("6");
+        BioExtra extra = new BioExtra().setCardQuota("6");
+//        extra.
 
         BioPayload bioPayload = new BioPayload();
 
@@ -158,8 +158,8 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
                     }
 
                     @Override
-                    public void onClose(String data) {
-                        Log.d("-- bootpay close", data);
+                    public void onClose() {
+                        Log.d("-- bootpay close", "-- bootpay close");
                         BootpayBio.removePaymentWindow();
                     }
 
@@ -203,8 +203,8 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
                     }
 
                     @Override
-                    public void onClose(String data) {
-                        Log.d("-- bootpay close", data);
+                    public void onClose() {
+                        Log.d("-- bootpay close", "-- bootpay close");
                         BootpayBio.removePaymentWindow();
                     }
 
@@ -247,8 +247,8 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
                     }
 
                     @Override
-                    public void onClose(String data) {
-                        Log.d("-- bootpay close", data);
+                    public void onClose() {
+                        Log.d("-- bootpay close", "-- bootpay close");
                         BootpayBio.removePaymentWindow();
                     }
 

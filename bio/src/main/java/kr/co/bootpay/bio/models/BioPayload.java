@@ -4,6 +4,10 @@ import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +41,7 @@ public class BioPayload  {
     private String userToken;
     private Map<String, Object> metadata = new HashMap<>();
 
-    private BootExtra extra;
+    private BioExtra extra;
     private BootUser user;
     List<BootItem> items = new ArrayList<>();
     private List<String> names;
@@ -187,11 +191,11 @@ public class BioPayload  {
         return this;
     }
 
-    public BootExtra getExtra() {
+    public BioExtra getExtra() {
         return extra;
     }
 
-    public BioPayload setExtra(BootExtra extra) {
+    public BioPayload setExtra(BioExtra extra) {
         this.extra = extra;
         return this;
     }
@@ -242,11 +246,107 @@ public class BioPayload  {
     }
 
 
+//    public String toJsonUnderscore() {
+//        Gson gson = new GsonBuilder()
+//                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+//                .create();
+//        return gson.toJson(this);
+//    }
+
+
+
+
     public String toJsonUnderscore() {
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .create();
-        return gson.toJson(this);
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put("application_id", applicationId);
+            jsonObject.put("pg", pg);
+            if(methods.size() > 0) {
+                jsonObject.put("method", new JSONArray(methods));
+            } else {
+                jsonObject.put("method", method);
+            }
+            jsonObject.put("order_name", orderName);
+            jsonObject.put("price", price);
+            jsonObject.put("tax_free", taxFree);
+
+            jsonObject.put("order_id", orderId);
+            jsonObject.put("subscription_id", subscriptionId);
+            jsonObject.put("authentication_id", authenticationId);
+
+            jsonObject.put("wallet_id", walletId);
+            jsonObject.put("token", token);
+            jsonObject.put("authenticate_type", authenticateType);
+            jsonObject.put("user_token", userToken);
+
+            jsonObject.put("extra", extra.toJsonObject());
+            jsonObject.put("user", user.toJsonObject());
+
+            if(items.size() > 0) {
+                List<JSONObject> itemList = new ArrayList<>();
+                for(BootItem item : items) {
+                    itemList.add(item.toJsonObject());
+                }
+                jsonObject.put("items", new JSONArray(itemList));
+            }
+
+            return jsonObject.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Gson gson = new GsonBuilder()
+                    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                    .create();
+
+            return gson.toJson(this);
+        }
+    }
+
+
+    public String toJsonUnderscoreEasyPay() {
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put("application_id", applicationId);
+            jsonObject.put("pg", pg);
+            if(methods.size() > 0) {
+                jsonObject.put("method", new JSONArray(methods));
+            } else {
+                jsonObject.put("method", method);
+            }
+            jsonObject.put("order_name", orderName);
+            jsonObject.put("price", price);
+            jsonObject.put("tax_free", taxFree);
+
+            jsonObject.put("order_id", orderId);
+            jsonObject.put("subscription_id", subscriptionId);
+            jsonObject.put("authentication_id", authenticationId);
+
+            jsonObject.put("wallet_id", walletId);
+            jsonObject.put("token", token);
+            jsonObject.put("authenticate_type", authenticateType);
+            jsonObject.put("user_token", userToken);
+
+            jsonObject.put("extra", extra.toJsonObjectEasyPay());
+            jsonObject.put("user", user.toJsonObject());
+
+            if(items.size() > 0) {
+                List<JSONObject> itemList = new ArrayList<>();
+                for(BootItem item : items) {
+                    itemList.add(item.toJsonObject());
+                }
+                jsonObject.put("items", new JSONArray(itemList));
+            }
+
+            return jsonObject.toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Gson gson = new GsonBuilder()
+                    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                    .create();
+
+            return gson.toJson(this);
+        }
     }
 
 //    public static BioPayload fromJson(String json) {
