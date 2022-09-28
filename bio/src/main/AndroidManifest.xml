@@ -7,7 +7,7 @@
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:supportsRtl="true">
-        <activity android:name="kr.co.bootpay.bio.activity.BootpayBioActivity" android:screenOrientation="portrait" android:theme="@style/Theme.Transparent" android:windowSoftInputMode="adjustResize"/>
+        <activity android:name="kr.co.bootpay.bio.activity.BioActivityInterface" android:screenOrientation="portrait" android:theme="@style/Theme.Transparent" android:windowSoftInputMode="adjustResize"/>
 
     </application>
 

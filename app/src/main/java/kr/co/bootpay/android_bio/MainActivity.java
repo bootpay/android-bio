@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
         Log.d("bootpay", token.access_token);
 
 //        String userId = UserInfo.getInstance(this).getBootpayUuid(); // 실제값을 적용하실 때에는, 관리하시는 user_id를 입력해주세요.
-        String userId = "123411aaaaaaaaaaaabd4ss1123";
+        String userId = "123411aaaaaaaaaaaabd4ss11234";
 
 
 

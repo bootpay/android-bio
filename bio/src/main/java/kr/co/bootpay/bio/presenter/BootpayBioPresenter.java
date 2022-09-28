@@ -2,10 +2,15 @@ package kr.co.bootpay.bio.presenter;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,12 +21,13 @@ import dev.samstevens.totp.code.HashingAlgorithm;
 import dev.samstevens.totp.exceptions.CodeGenerationException;
 import kr.co.bootpay.android.pref.UserInfo;
 import kr.co.bootpay.bio.R;
-import kr.co.bootpay.bio.activity.BootpayBioActivity;
+import kr.co.bootpay.bio.activity.BioActivityInterface;
 import kr.co.bootpay.bio.api.BioApiService;
-import kr.co.bootpay.bio.api.NextJobInterface;
+import kr.co.bootpay.bio.api.WebviewEventInterface;
 import kr.co.bootpay.bio.constants.BioConstants;
 import kr.co.bootpay.bio.helper.SharedPreferenceHelper;
 import kr.co.bootpay.bio.memory.CurrentBioRequest;
+import kr.co.bootpay.bio.models.BioMetric;
 import kr.co.bootpay.bio.models.BioPayload;
 import kr.co.bootpay.bio.models.NextJob;
 import kr.co.bootpay.bio.models.ResError;
@@ -33,18 +39,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class BootpayBioPresenter implements NextJobInterface {
+public class BootpayBioPresenter implements WebviewEventInterface {
 
     public ResWalletList walletList = new ResWalletList();
     public BioPayload bioPayload;
-    public BootpayBioActivity bioActivity;
+    public BioActivityInterface bioActivity;
     public BootpayBioWebView bioWebView;
 //    public int selectedCardIndex = -1;
     BioApiService service;
     Context context;
 
-    public BootpayBioPresenter(Context context, BootpayBioActivity activity, BootpayBioWebView webView) {
-        CurrentBioRequest.getInstance().nextJobListener = this;
+    public BootpayBioPresenter(Context context, BioActivityInterface activity, BootpayBioWebView webView) {
+        CurrentBioRequest.getInstance().webviewEventListner = this;
         this.service = new BioApiService(context);
         this.bioActivity = activity;
         this.bioWebView = webView;
@@ -59,18 +65,24 @@ public class BootpayBioPresenter implements NextJobInterface {
     public void showCardView(List<WalletData> walletList) {
 
         if(bioActivity == null) return;
-        if(walletList != null) {
-            bioActivity.setWalletList(walletList);
-        }
-
-        bioActivity.showCardView();
-        bioActivity.hideWebView();
+//        if(walletList != null && walletList.size() > 0) {
+//            bioActivity.setWalletList(walletList);
+//        }
+//        bioActivity.setWalletList();
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            bioActivity.showCardView(false);
+            bioActivity.hideWebView();
+        });
     }
 
     public void showWebView() {
         if(bioActivity == null) return;
-        bioActivity.hideCardView();
-        bioActivity.showWebView();
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            bioActivity.hideCardView();
+            bioActivity.showWebView();
+        });
     }
 
     public boolean isShowCardView() {
@@ -94,13 +106,17 @@ public class BootpayBioPresenter implements NextJobInterface {
     }
 
     public boolean nowAbleBioAuthDevice() {
-        return bioActivity.nowAbleBioAuthDevice();
+//        return bioActivity.nowAbleBioAuthDevice();
+        return true;
     }
 
     public boolean didAbleBioAuthDevice() {
-        if(walletList == null) return false;
+//        if(walletList == null) return false;
 //        return walletList.biometric.biometric_confirmed;
-        return walletList.biometric.biometric_confirmed && SharedPreferenceHelper.getValue(context, "biometric_secret_key").length() > 0;
+        String biometric_secret_key = SharedPreferenceHelper.getValue(context, "biometric_secret_key");
+        return walletList.biometric.biometric_confirmed && biometric_secret_key.length() > 0;
+
+//        return didAbleBioAuthDevice() && nowAbleBioAuthDevice();
     }
 
     public void setPasswordToken(String token) {
@@ -112,7 +128,7 @@ public class BootpayBioPresenter implements NextJobInterface {
     }
 
     public void initDeviceBioInfo() {
-        SharedPreferenceHelper.setValue(context, "password_token", "");
+        SharedPreferenceHelper.setValue(context, "biometric_secret_key", "");
     }
 
 
@@ -131,7 +147,8 @@ public class BootpayBioPresenter implements NextJobInterface {
                 try {
                     if(response.isSuccessful()) {
                         walletList = new Gson().fromJson(response.body().string(), ResWalletList.class);
-                        CurrentBioRequest.getInstance().wallets = walletList.wallets;
+//                        CurrentBioRequest.getInstance().wallets = walletList.wallets;
+                        bioActivity.setWalletList(walletList.wallets);
 
                         if(requestBioPay == true) {
                             requestBioForPay();
@@ -143,7 +160,8 @@ public class BootpayBioPresenter implements NextJobInterface {
                             if(walletList.wallets.size() == 0) {
                                 SharedPreferenceHelper.setValue(context, "biometric_secret_key", "");
                             }
-                            initDeviceBioInfo();
+                            setPasswordToken("");
+//                            initDeviceBioInfo();
                         }
 
 //                        if(walletList.wallets.size() == 0) {
@@ -189,6 +207,7 @@ public class BootpayBioPresenter implements NextJobInterface {
         });
         builder.setPositiveButton("삭제", (dialogInterface, i) -> {
 //            selectedCardIndex = index;
+            setPasswordToken("");
             CurrentBioRequest.getInstance().selectedCardIndex = index;
             bioPayload.setWalletId(walletList.wallets.get(index).wallet_id);
             if(!isShowWebView()) showWebView();
@@ -296,6 +315,7 @@ public class BootpayBioPresenter implements NextJobInterface {
                 data.biometric_secret_key != null && data.biometric_secret_key.length() > 0) {
             SharedPreferenceHelper.setValue(context, "biometric_device_uuid", data.biometric_device_uuid);
             SharedPreferenceHelper.setValue(context, "biometric_secret_key", data.biometric_secret_key);
+//            SharedPreferenceHelper.set(context, "server_unixtime", data.serverUnixtime);
         }
 
         bioActivity.runOnUiThread(() -> {
@@ -307,7 +327,9 @@ public class BootpayBioPresenter implements NextJobInterface {
                 requestDeleteCard();
             } else if(data.nextType == BioConstants.REQUEST_PASSWORD_FOR_PAY) {
                requestPasswordForPay();
-            }  else if(data.nextType == BioConstants.NEXT_JOB_GET_WALLET_LIST) {
+            } else if(data.nextType == BioConstants.REQUEST_DELETE_CARD) {
+                requestDeleteCard();
+            } else if(data.nextType == BioConstants.NEXT_JOB_GET_WALLET_LIST) {
                 if(data.type == BioConstants.REQUEST_ADD_BIOMETRIC_FOR_PAY) {
                     getWalletList(true);
                 } else {
@@ -315,6 +337,261 @@ public class BootpayBioPresenter implements NextJobInterface {
                 }
             }
         });
+    }
+
+    @Override
+    public void onWebViewCancel(String data) {
+        Log.d("bootpay", "onWebViewCancel : " + data);
+        if(CurrentBioRequest.getInstance().listener != null) {
+            CurrentBioRequest.getInstance().listener.onCancel(data);
+            CurrentBioRequest.getInstance().listener.onClose();
+        }
+    }
+
+    @Override
+    public void onWebViewClose(String data) {
+        Log.d("bootpay", "onWebViewClose : " + data + ", " + CurrentBioRequest.getInstance().requestType);
+//        if(CurrentBioRequest.getInstance().listener != null) {
+//            CurrentBioRequest.getInstance().listener.onCancel(data);
+//            CurrentBioRequest.getInstance().listener.onClose();
+//        }
+
+        //토큰 받은 후 결제
+        if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY ||
+                CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_PASSWORD_FOR_PAY ||
+                CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_BIOAUTH_FOR_BIO_FOR_PAY) {
+//            bioActivity.showCardView(false);
+            return;
+        }
+
+        if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_BIO_FOR_PAY ||
+                CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_ADD_CARD ||
+                CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_DELETE_CARD ||
+                CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_DELETE_CARD ||
+                CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_FOR_PAY) {
+            return;
+        }
+
+//        if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_FOR_PAY) {
+//            NextJob job = new NextJob();
+//            job.initToken = true;
+//            onNextJob(job);
+//        }
+        if(CurrentBioRequest.getInstance().listener != null) {
+            CurrentBioRequest.getInstance().listener.onClose();
+        }
+    }
+
+    @Override
+    public void onWebViewError(String data) {
+        Log.d("bootpay", "onWebViewError : " + data);
+
+        if(CurrentBioRequest.getInstance().listener != null) {
+            CurrentBioRequest.getInstance().listener.onError(data);
+
+            if(bioPayload != null) {
+                if(bioPayload.getExtra() != null) {
+                    if(bioPayload.getExtra().isDisplayErrorResult() != true) {
+                        CurrentBioRequest.getInstance().listener.onClose();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onWebViewIssued(String data) {
+        Log.d("bootpay", "onWebViewIssued : " + data);
+
+        if(CurrentBioRequest.getInstance().listener != null) {
+            CurrentBioRequest.getInstance().listener.onIssued(data);
+
+            if(bioPayload != null) {
+                if(bioPayload.getExtra() != null) {
+                    if(bioPayload.getExtra().isDisplaySuccessResult() != true) {
+                        CurrentBioRequest.getInstance().listener.onClose();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onWebViewConfirm(String data) {
+        Log.d("bootpay", "onWebViewConfirm : " + data);
+        goConfirmEvent(data);
+    }
+
+    @Override
+    public void onWebViewDone(String data) {
+        Log.d("bootpay", "onWebViewDone : " + data);
+        if(CurrentBioRequest.getInstance().listener != null) {
+            CurrentBioRequest.getInstance().listener.onDone(data);
+
+            if(bioPayload != null) {
+                if(bioPayload.getExtra() != null) {
+                    if(bioPayload.getExtra().isDisplaySuccessResult() != true) {
+                        CurrentBioRequest.getInstance().listener.onClose();
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onWebViewRedirect(String data) {
+        Log.d("bootpay", "onWebViewRedirect : " + data);
+        if("undefined".equals(data)) return;
+        try {
+            JSONObject json = new JSONObject(data);
+            String event = String.valueOf(json.get("event"));
+            switch (event) {
+                case "error":
+                    onWebViewError(data);
+                    break;
+                case "close":
+                    onWebViewClose(data);
+                    break;
+                case "cancel":
+                    onWebViewCancel(data);
+                    break;
+                case "issued":
+                    onWebViewIssued(data);
+                    break;
+                case "confirm":
+                    onWebViewConfirm(data);
+                    break;
+                case "done":
+                    onWebViewDone(data);
+                    break;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onWebViewEasySuccess(String data) {
+        Log.d("bootpay", "onWebViewEasySuccess : " + data + ", " + CurrentBioRequest.getInstance().requestType);
+
+        if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN ||
+                CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_ADD_CARD ||
+                CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_DELETE_CARD ||
+                CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY ||
+                CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_PASSWORD_FOR_PAY) {
+
+            NextJob job = new NextJob();
+            job.type = CurrentBioRequest.getInstance().requestType;
+            job.token = data.replaceAll("\"", "");
+//            job.initToken = true;
+            if(CurrentBioRequest.getInstance().requestType != BioConstants.REQUEST_PASSWORD_TOKEN_DELETE_CARD) {
+                job.nextType = BioConstants.NEXT_JOB_RETRY_PAY;
+            } else {
+                job.nextType = BioConstants.REQUEST_DELETE_CARD;
+            }
+            onNextJob(job);
+            return;
+        } else if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_ADD_BIOMETRIC_FOR_PAY) {
+            BioMetric bioMetric = new Gson().fromJson(data, BioMetric.class);
+
+            NextJob job = new NextJob();
+            job.type = CurrentBioRequest.getInstance().requestType;
+            job.nextType = BioConstants.NEXT_JOB_GET_WALLET_LIST;
+            job.biometric_device_uuid = bioMetric.biometric_device_uuid;
+            job.biometric_secret_key = bioMetric.biometric_secret_key;
+            job.serverUnixtime = bioMetric.server_unixtime;
+            onNextJob(job);
+        } else {
+            if(BioConstants.REQUEST_PASSWORD_FOR_PAY == CurrentBioRequest.getInstance().requestType ||
+                    BioConstants.REQUEST_ADD_CARD == CurrentBioRequest.getInstance().requestType) {
+                NextJob job = new NextJob();
+                job.initToken = true;
+                onNextJob(job);
+            }
+
+            if(BioConstants.REQUEST_DELETE_CARD == CurrentBioRequest.getInstance().requestType ||
+                    BioConstants.REQUEST_ADD_CARD == CurrentBioRequest.getInstance().requestType) {
+
+                getWalletList(false);
+//                showCardView(null);
+                return;
+            }
+
+            if(bioPayload.getExtra() != null && bioPayload.getExtra().isSeparatelyConfirmedBio() == true) {
+                if(CurrentBioRequest.getInstance().listener != null) {
+                    CurrentBioRequest.getInstance().listener.onConfirm(data);
+                }
+            } else {
+                if(bioPayload.getExtra() != null && !"redirect".equals(bioPayload.getExtra().getOpenType())) {
+                    //redirect 가 아니고, 분리승인일 수 있음  (통합결제)
+                    try {
+                        JSONObject json = new JSONObject(data);
+                        String event = String.valueOf(json.get("event"));
+                        switch (event) {
+                            case "confirm":
+//                                onWebViewConfirm(data);
+                                goConfirmEvent(data);
+                                break;
+                            case "done":
+//                                onWebViewDone(data);
+                                if(CurrentBioRequest.getInstance().listener != null) {
+                                    CurrentBioRequest.getInstance().listener.onConfirm(data);
+                                }
+                                if(bioPayload.getExtra() != null && bioPayload.getExtra().isDisplaySuccessResult() == true) {
+                                    if(CurrentBioRequest.getInstance().listener != null) {
+                                        CurrentBioRequest.getInstance().listener.onClose();
+                                    }
+                                }
+                                break;
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                if(CurrentBioRequest.getInstance().listener != null) {
+                    CurrentBioRequest.getInstance().listener.onDone(data);
+                    CurrentBioRequest.getInstance().listener.onClose();
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void onWebViewEasyError(String data) {
+        Log.d("bootpay", "onWebViewEasyError : " + data);
+
+        try {
+            JSONObject json = new JSONObject(data);
+            String event = String.valueOf(json.get("error_code"));
+            NextJob job = new NextJob();
+            switch (event) {
+                case "USER_BIOMETRIC_OTP_INVALID":
+                    job.initToken = true;
+                    onNextJob(job);
+                    initDeviceBioInfo();
+                    CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
+                    if(CurrentBioRequest.getInstance().listener != null) {
+                        CurrentBioRequest.getInstance().listener.onError(data);
+                    }
+                    break;
+                case "USER_PW_TOKEN_NOT_FOUND":
+                case "USER_PW_TOKEN_EXPIRED":
+                    job.initToken = true;
+                    job.nextType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
+                    onNextJob(job);
+                    break;
+                default:
+                    CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
+                    if(CurrentBioRequest.getInstance().listener != null) {
+                        CurrentBioRequest.getInstance().listener.onError(data);
+                    }
+                    break;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public void goClickCard(WalletData data) {
@@ -352,11 +629,18 @@ public class BootpayBioPresenter implements NextJobInterface {
             return;
         }
 
-        setRequestType(BioConstants.REQUEST_BIO_FOR_PAY);
+//        setRequestType(BioConstants.REQUEST_BIO_FOR_PAY);
+//        if(!isAblePasswordToken()) {
+//            requestPasswordToken(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY);
+//            return;
+//        }
+
         if(!isAblePasswordToken()) {
             requestPasswordToken(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY);
             return;
         }
+
+
         if(isAbleBioAuthDevice()) {
             goBioForPay();
             return;
@@ -378,5 +662,29 @@ public class BootpayBioPresenter implements NextJobInterface {
     private void goBioForPay() {
         setRequestType(BioConstants.REQUEST_BIO_FOR_PAY);
         goBiometricAuth();
+    }
+
+    void goConfirmEvent(String data) {
+        boolean goTransaction = false;
+        if(CurrentBioRequest.getInstance().listener != null) goTransaction = CurrentBioRequest.getInstance().listener.onConfirm(data);
+        if(goTransaction) bioActivity.transactionConfirm();
+
+//        if (mExtEventListener != null) mExtEventListener.onProgressShow(true);
+//        boolean goTransaction = false;
+//        if (mEventListener != null) goTransaction = mEventListener.onConfirm(data);
+//        if(goTransaction) transactionConfirm(data);
+//        return String.valueOf(goTransaction);
+    }
+
+    boolean isDisplaySuccess() {
+        if(bioPayload == null) return false;
+        if(bioPayload.getExtra() == null) return false;
+        return bioPayload.getExtra().isDisplaySuccessResult();
+    }
+
+    boolean isDisplayError() {
+        if(bioPayload == null) return false;
+        if(bioPayload.getExtra() == null) return false;
+        return bioPayload.getExtra().isDisplayErrorResult();
     }
 }

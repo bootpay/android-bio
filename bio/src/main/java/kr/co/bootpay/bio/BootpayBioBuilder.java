@@ -13,7 +13,7 @@ import android.util.Log;
 import androidx.biometric.BiometricManager;
 
 import kr.co.bootpay.android.events.BootpayEventListener;
-import kr.co.bootpay.bio.activity.BootpayBioActivity;
+import kr.co.bootpay.bio.activity.BioActivityInterface;
 import kr.co.bootpay.bio.constants.BioConstants;
 import kr.co.bootpay.bio.memory.CurrentBioRequest;
 import kr.co.bootpay.bio.models.BioPayload;
@@ -121,14 +121,14 @@ public class BootpayBioBuilder {
             case BIOMETRIC_SUCCESS:
             case BIOMETRIC_STATUS_UNKNOWN: {
                 CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
-                Intent intent = new Intent(mContext, BootpayBioActivity.class);
+                Intent intent = new Intent(mContext, BioActivityInterface.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 mContext.startActivity(intent);
             }
             break;
             case BIOMETRIC_ERROR_NO_HARDWARE: {
                 CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
-                Intent intent = new Intent(mContext, BootpayBioActivity.class);
+                Intent intent = new Intent(mContext, BioActivityInterface.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 mContext.startActivity(intent);
             }

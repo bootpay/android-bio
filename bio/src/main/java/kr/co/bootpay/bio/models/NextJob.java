@@ -7,4 +7,5 @@ public class NextJob {
     public String token;
     public String biometric_device_uuid;
     public String biometric_secret_key;
+    public int serverUnixtime;
 }

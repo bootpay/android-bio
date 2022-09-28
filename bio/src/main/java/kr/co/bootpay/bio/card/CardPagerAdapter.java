@@ -31,10 +31,10 @@ public class CardPagerAdapter extends FragmentStatePagerAdapter {
 
     }
 
-    public void setData(List<WalletData> data) {
-        if(this.data != null) this.data.clear();
-        this.data = data;
-        if(this.data == null) return;
+    public void setData(List<WalletData> list) {
+//        if(this.data != null) this.data.clear();
+        this.data = list;
+//        if(this.data == null) return;
 //        if(this.data.wallets == null) return;
         addWallet(1);
 

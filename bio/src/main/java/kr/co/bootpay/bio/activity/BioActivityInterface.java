@@ -7,7 +7,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -17,7 +16,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Vibrator;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -38,14 +36,12 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.material.shape.CornerFamily;
-import com.google.android.material.shape.MaterialShapeDrawable;
-import com.google.android.material.shape.ShapeAppearanceModel;
 import com.skydoves.powerspinner.PowerSpinnerView;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.Executor;
 
 import kr.co.bootpay.bio.R;
@@ -63,7 +59,7 @@ import kr.co.bootpay.bio.presenter.BootpayBioPresenter;
 import kr.co.bootpay.bio.webview.BootpayBioWebView;
 
 
-public class BootpayBioActivity extends FragmentActivity  {
+public class BioActivityInterface extends FragmentActivity implements kr.co.bootpay.bio.api.BioActivityInterface {
 
     private Context context;
     private BootpayBioPresenter presenter;
@@ -281,7 +277,7 @@ public class BootpayBioActivity extends FragmentActivity  {
 
             }
         });
-        final BootpayBioActivity scope = this;
+        final BioActivityInterface scope = this;
         findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -477,13 +473,13 @@ public class BootpayBioActivity extends FragmentActivity  {
         });
     }
 
-    public void setCardPager() {
+    public void setCardPager(List<WalletData> list) {
 //        this.data = data;
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
             @Override
             public void run() {
-                cardPagerAdapter.setData(walletList.wallets);
+                cardPagerAdapter.setData(list);
                 cardPagerAdapter.notifyDataSetChanged();
             }
         });
@@ -582,38 +578,45 @@ public class BootpayBioActivity extends FragmentActivity  {
                 .build();
     }
 
+    @Override
     public void goBiometricAuth() {
         Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
+        handler.post(() -> {
+            if(!presenter.isAblePasswordToken()) {
+                presenter.requestPasswordToken(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_BIO_FOR_PAY);
+                return;
+            }
 
-                switch (BiometricManager.from(context).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
-                    case BIOMETRIC_SUCCESS: {
-                        biometricPrompt.authenticate(promptInfo);
-                    }
-                    break;
-                    case BIOMETRIC_ERROR_NO_HARDWARE: {
-                        Toast.makeText(context, "생체인증 정보가 등록되지 않은 기기입니다. 비밀번호 인증 방식으로 진행합니다.", Toast.LENGTH_SHORT).show();
+//            if(!presenter.isAbleBioAuthDevice()) {
+//                presenter.requestPasswordForPay();
+//                return;
+//            }
 
-                        presenter.setRequestType(BioConstants.REQUEST_PASSWORD_FOR_PAY);
-                        presenter.requestPasswordForPay();
-                    }
-                    break;
-                    default: {
+            switch (BiometricManager.from(context).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
+                case BIOMETRIC_SUCCESS: {
+                    biometricPrompt.authenticate(promptInfo);
+                }
+                break;
+                case BIOMETRIC_ERROR_NO_HARDWARE: {
+                    Toast.makeText(context, "생체인증 정보가 등록되지 않은 기기입니다. 비밀번호 인증 방식으로 진행합니다.", Toast.LENGTH_SHORT).show();
+
+                    presenter.setRequestType(BioConstants.REQUEST_PASSWORD_FOR_PAY);
+                    presenter.requestPasswordForPay();
+                }
+                break;
+                default: {
 //                        Toast.makeText(context, "생체인증 정보가 등록되었는지 알 수 없는 상태입니다. 생체인증을 지원하지 않는 기기일 수 있습니다. 비밀번호 인증 방식으로 진행합니다. " + BiometricManager.from(context).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK), Toast.LENGTH_SHORT).show();
 
-                        presenter.setRequestType(BioConstants.REQUEST_PASSWORD_FOR_PAY);
-                        presenter.requestPasswordForPay();
-                    }
-                    break;
+                    presenter.setRequestType(BioConstants.REQUEST_PASSWORD_FOR_PAY);
+                    presenter.requestPasswordForPay();
                 }
+                break;
+            }
 //                if(BiometricManager.from(context).canAuthenticate() == BIOMETRIC_SUCCESS) {
 //                    biometricPrompt.authenticate(promptInfo);
 //                }  else {
 //                    Toast.makeText(context, "생체인증 정보가 등록되지 않은 기기입니다.", Toast.LENGTH_SHORT).show();
 //                }
-            }
         });
     }
 
@@ -644,44 +647,67 @@ public class BootpayBioActivity extends FragmentActivity  {
     }
 
 
-    public void setWalletList(List<WalletData> walletList) {
-        if(walletList == null) return;
+    public void setWalletList(List<WalletData> list) {
+//        if(walletList == null || walletList.size() == 0) return;
+//        this.walletList.wallets = CurrentBioRequest.getInstance().wallets;
 
         if(this.walletList == null) this.walletList = new ResWalletList();
-        if(this.walletList.wallets != null) this.walletList.wallets.clear();
-        this.walletList.wallets = walletList;
+        if(this.walletList.wallets == null) this.walletList.wallets = new ArrayList<>();
+        this.walletList.wallets = list;
+//        if(this.walletList.wallets != null) this.walletList.wallets.clear();
+//        this.walletList.wallets = walletList;
+//
+//        CurrentBioRequest.getInstance().wallets = walletList;
 
-        CurrentBioRequest.getInstance().wallets = walletList;
-
-        setCardPager();
+        setCardPager(list);
         updateButtonTitle();
 
     }
 
-    public void showCardView() {
-        card_layout.setVisibility(View.VISIBLE);
-        card_actionsheet_layout.setVisibility(View.VISIBLE);
-        card_actionsheet_bottom_layout.setVisibility(View.VISIBLE);
+    @Override
+    public void showCardView(boolean isRefresh) {
+        runOnUiThread(() -> {
+            card_layout.setVisibility(View.VISIBLE);
+            card_actionsheet_layout.setVisibility(View.VISIBLE);
+            card_actionsheet_bottom_layout.setVisibility(View.VISIBLE);
+        });
     }
 
     public void hideWebView() {
+//        runOnUiThread(() -> {
+//            bioWebView.setVisibility(View.GONE);
+//        });
+
         bioWebView.setVisibility(View.GONE);
     }
 
     public void hideCardView() {
+//        runOnUiThread(() -> {
+//            card_layout.setVisibility(View.GONE);
+//            card_actionsheet_layout.setVisibility(View.GONE);
+//            card_actionsheet_bottom_layout.setVisibility(View.GONE);
+//        });
+
         card_layout.setVisibility(View.GONE);
         card_actionsheet_layout.setVisibility(View.GONE);
         card_actionsheet_bottom_layout.setVisibility(View.GONE);
     }
 
+    @Override
     public void showWebView() {
+//        runOnUiThread(() -> {
+//            bioWebView.setVisibility(View.VISIBLE);
+//        });
+
         bioWebView.setVisibility(View.VISIBLE);
     }
 
+    @Override
     public boolean isShowCardView() {
         return card_layout.getVisibility() == View.VISIBLE;
     }
 
+    @Override
     public boolean isShowWebView() {
         return bioWebView.getVisibility() == View.VISIBLE;
     }
