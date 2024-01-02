@@ -141,6 +141,7 @@ public class BioActivityInterface extends FragmentActivity implements kr.co.boot
         bioPayload = CurrentBioRequest.getInstance().bioPayload;;
         initProgressCircle();
 
+        bioFailCount = 0;
         CurrentBioRequest.getInstance().isCDNLoaded = false;
         CurrentBioRequest.getInstance().activity = this;
         CurrentBioRequest.getInstance().selectedQuota = "0";
@@ -517,6 +518,12 @@ public class BioActivityInterface extends FragmentActivity implements kr.co.boot
         return bioFailCount <= 3;
     }
 
+    void showToastBioError() {
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(() -> {
+            Toast.makeText(context, "비밀번호를 입력하시면 결제가 진행됩니다", Toast.LENGTH_SHORT).show();
+        });
+    }
 
     private Executor executor;
     private BiometricPrompt biometricPrompt;
@@ -531,6 +538,10 @@ public class BioActivityInterface extends FragmentActivity implements kr.co.boot
                 super.onAuthenticationError(errorCode, errString);
                 if(bioFailCount > 3 || errorCode != 13 ) { //9
                     if(biometricPrompt != null) biometricPrompt.cancelAuthentication();
+
+                    showToastBioError();
+                    //다시 비밀번호 요청
+                    presenter.requestPasswordToken(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_PASSWORD_FOR_PAY);
 //                    goPopUpForPasswordPay();
                 }
             }
@@ -564,9 +575,12 @@ public class BioActivityInterface extends FragmentActivity implements kr.co.boot
                 if(bioFailCount > 2) {
                     //팝업 물어보고 OK시 verify password for pay
                     if(biometricPrompt != null) biometricPrompt.cancelAuthentication();
+                    //다시 비밀번호 요청
+                    showToastBioError();
+                    presenter.requestPasswordToken(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_PASSWORD_FOR_PAY);
 //                    goPopUpForPasswordPay();
                 } else {
-                    Toast.makeText(context, "지문인식에 인식에 실패하였습니다. (" + bioFailCount + "/3)", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "지문인식에 실패하였습니다. (" + bioFailCount + "/3)", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -606,9 +620,10 @@ public class BioActivityInterface extends FragmentActivity implements kr.co.boot
                 break;
                 default: {
 //                        Toast.makeText(context, "생체인증 정보가 등록되었는지 알 수 없는 상태입니다. 생체인증을 지원하지 않는 기기일 수 있습니다. 비밀번호 인증 방식으로 진행합니다. " + BiometricManager.from(context).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK), Toast.LENGTH_SHORT).show();
-
-                    presenter.setRequestType(BioConstants.REQUEST_PASSWORD_FOR_PAY);
-                    presenter.requestPasswordForPay();
+//                    presenter.setRequestType(BioConstants.REQUEST_PASSWORD_FOR_PAY);
+//                    presenter.requestPasswordToken();
+                    //다시 비밀번호 요청
+                    presenter.requestPasswordToken(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_PASSWORD_FOR_PAY);
                 }
                 break;
             }

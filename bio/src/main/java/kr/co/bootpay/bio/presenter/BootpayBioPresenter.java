@@ -486,6 +486,10 @@ public class BootpayBioPresenter implements WebviewEventInterface {
 //            job.initToken = true;
             if(CurrentBioRequest.getInstance().requestType != BioConstants.REQUEST_PASSWORD_TOKEN_DELETE_CARD) {
                 job.nextType = BioConstants.NEXT_JOB_RETRY_PAY;
+                if(CurrentBioRequest.getInstance().requestType == BioConstants.REQUEST_PASSWORD_TOKEN_FOR_PASSWORD_FOR_PAY) {
+//                    job. = BioConstants.NEXT
+                    job.nextType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
+                }
             } else {
                 job.nextType = BioConstants.REQUEST_DELETE_CARD;
             }
