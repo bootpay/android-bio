@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
+import android.widget.Toast;
 
 import androidx.biometric.BiometricManager;
 
@@ -114,34 +114,48 @@ public class BootpayBioBuilder {
             CurrentBioRequest.getInstance().bioThemeData = mBioThemeData;
         }
 
+        if(CurrentBioRequest.getInstance().isPasswordMode) {
+            startPasswordPayment();
+            return;
+        }
+
 
 //        CurrentBioRequest.getInstance().activity = null;
 
         switch (BiometricManager.from(mContext).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK)) {
             case BIOMETRIC_SUCCESS:
             case BIOMETRIC_STATUS_UNKNOWN: {
-                CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
-                Intent intent = new Intent(mContext, BioActivityInterface.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                mContext.startActivity(intent);
+                startBioPayment();
             }
             break;
             case BIOMETRIC_ERROR_NO_HARDWARE: {
-                CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
-                Intent intent = new Intent(mContext, BioActivityInterface.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                mContext.startActivity(intent);
+                Toast.makeText(mContext, " 생체인증 정보가 등록되지 않아 비밀번호로 결제합니다.", Toast.LENGTH_SHORT).show();
+                startPasswordPayment();
             }
             break;
             default: {
-                Log.d("bootpay", "status: " + BiometricManager.from(mContext).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK));
-//                CurrentBioRequest.getInstance().type = BioConstants.REQUEST_TYPE_PASSWORD_PAY;
-//                Intent intent = new Intent(mContext, BootpayBioWebviewActivity.class);
-//                mContext.startActivity(intent);
+                Toast.makeText(mContext, "생체인증 정보가 등록되지 않아 비밀번호로 결제합니다.", Toast.LENGTH_SHORT).show();
+//                Log.d("bootpay", "status: " + BiometricManager.from(mContext).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK));
+                startPasswordPayment();
             }
             break;
         }
 
+    }
+
+    void startBioPayment() {
+        CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_TYPE_NONE;
+        Intent intent = new Intent(mContext, BioActivityInterface.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        mContext.startActivity(intent);
+    }
+
+    void startPasswordPayment() {
+        CurrentBioRequest.getInstance().isPasswordMode = true;
+        CurrentBioRequest.getInstance().requestType = BioConstants.REQUEST_PASSWORD_FOR_PAY;
+        Intent intent = new Intent(mContext, BioActivityInterface.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        mContext.startActivity(intent);
     }
 
     public void transactionConfirm(String data) {

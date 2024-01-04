@@ -334,8 +334,14 @@ public class BioActivityInterface extends FragmentActivity implements kr.co.boot
     void updateButtonTitle() {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(() -> {
-            if(CurrentBioRequest.getInstance().wallets == null) return;
-            int size = CurrentBioRequest.getInstance().wallets.size();
+//            if(CurrentBioRequest.getInstance().wallets == null) return;
+//            int size = CurrentBioRequest.getInstance().wallets.size();
+
+            int size = 0;
+            if(this.walletList != null && this.walletList.wallets != null) {
+                size = this.walletList.wallets.size();
+            }
+
 
 //            if(C)
             if(CurrentBioRequest.getInstance().isEditMode == true) {
@@ -543,6 +549,9 @@ public class BioActivityInterface extends FragmentActivity implements kr.co.boot
                     //다시 비밀번호 요청
                     presenter.requestPasswordToken(BioConstants.REQUEST_PASSWORD_TOKEN_FOR_PASSWORD_FOR_PAY);
 //                    goPopUpForPasswordPay();
+                } else if(errorCode == 13){
+                    if(CurrentBioRequest.getInstance().listener != null) CurrentBioRequest.getInstance().listener.onCancel("사용자가 창을 닫았습니다");
+                    finish();
                 }
             }
 
@@ -612,7 +621,7 @@ public class BioActivityInterface extends FragmentActivity implements kr.co.boot
                 }
                 break;
                 case BIOMETRIC_ERROR_NO_HARDWARE: {
-                    Toast.makeText(context, "생체인증 정보가 등록되지 않은 기기입니다. 비밀번호 인증 방식으로 진행합니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "생체인증 정보가 등록되지 않아 비밀번호로 결제합니다.", Toast.LENGTH_SHORT).show();
 
                     presenter.setRequestType(BioConstants.REQUEST_PASSWORD_FOR_PAY);
                     presenter.requestPasswordForPay();

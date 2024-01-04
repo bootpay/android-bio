@@ -1,6 +1,6 @@
 ext {
     PUBLISH_GROUP_ID = 'io.github.bootpay'
-    PUBLISH_VERSION = '4.4.2'
+    PUBLISH_VERSION = '4.4.21'
     PUBLISH_ARTIFACT_ID = 'android-bio'
     PUBLISH_DESCRIPTION = 'Bootpay Android Bio Library'
     PUBLISH_URL = 'https://github.com/bootpay/android-bio'
@@ -9,7 +9,7 @@ ext {
             'https://github.com/bootpay/android-bio/blob/main/LICENSE'
     PUBLISH_DEVELOPER_ID = 'bootpay'
     PUBLISH_DEVELOPER_NAME = 'ehowlsla'
-    PUBLISH_DEVELOPER_EMAIL = 'rupy1014@gmail.com'
+    PUBLISH_DEVELOPER_EMAIL = 'ehowlsla@bootpay.co.kr'
     PUBLISH_SCM_CONNECTION =
             'scm:git:github.com/bootpay/android-bio.git'
     PUBLISH_SCM_DEVELOPER_CONNECTION =

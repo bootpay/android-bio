@@ -32,7 +32,7 @@ public class CurrentBioRequest {
     public long startWindowTime = System.currentTimeMillis() - 3000;
 
     public BioDevice bioDevice; // 이 기기에서 생체인증 정보가 활성화 되었는지
-    public List<WalletData> wallets; //내 지갑 리스트
+//    public List<WalletData> wallets; //내 지갑 리스트
     public WebviewEventInterface webviewEventListner;
     public int selectedCardIndex = 0;
     public String selectedQuota = "0";
@@ -41,7 +41,7 @@ public class CurrentBioRequest {
     public static CurrentBioRequest getInstance() {
         if(instance == null) {
             instance = new CurrentBioRequest();
-            instance.wallets = new ArrayList<>();
+//            instance.wallets = new ArrayList<>();
             instance.bioThemeData = new BioThemeData();
         }
         return instance;
