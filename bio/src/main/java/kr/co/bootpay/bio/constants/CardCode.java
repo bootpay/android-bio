@@ -111,6 +111,9 @@ public class CardCode {
             case LT:
                 return R.color.card_default;
             case CT:
+                return R.drawable.card_new;
+            case NH:
+                return R.drawable.card_nh;
             case SH2:
             case SH3:
                 return R.drawable.card_new;
@@ -129,7 +132,6 @@ public class CardCode {
             case GJCB:
                 return R.drawable.card_gjcb;
             case SKOK:
-                return R.drawable.card_default;
             case POST:
                 return R.drawable.card_post;
             case SM:
