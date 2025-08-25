@@ -1,4 +1,5 @@
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 // 서명 설정 읽기
 ext["signing.keyId"] = ''
@@ -12,6 +13,15 @@ if (secretPropsFile.exists()) {
     p.each { name, value -> ext[name] = value }
 }
 
+android {
+    publishing {
+        singleVariant('release') {
+            // 소스 JAR와 Javadoc JAR 모두 제거
+            // Android 라이브러리에서는 기본 AAR만으로 충분
+        }
+    }
+}
+
 group = PUBLISH_GROUP_ID
 version = PUBLISH_VERSION
 
@@ -19,11 +29,11 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
+                // The coordinates of the library, being set from variables that
+                // we'll set up later
                 groupId PUBLISH_GROUP_ID
                 artifactId PUBLISH_ARTIFACT_ID
                 version PUBLISH_VERSION
-
-                // AGP 8.0+에서는 components.release가 자동으로 생성됨
                 from components.release
 
                 pom {
@@ -44,6 +54,8 @@ afterEvaluate {
                         }
                     }
 
+                    // Version control info - if you're using GitHub, follow the
+                    // format as seen here
                     scm {
                         connection = PUBLISH_SCM_CONNECTION
                         developerConnection = PUBLISH_SCM_DEVELOPER_CONNECTION
@@ -63,7 +75,6 @@ afterEvaluate {
 
 // 서명 설정이 있을 때만 서명 적용
 if (ext["signing.keyId"] && ext["signing.password"] && ext["signing.secretKeyRingFile"]) {
-    apply plugin: 'signing'
     signing {
         sign publishing.publications
     }

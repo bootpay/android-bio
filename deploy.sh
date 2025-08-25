@@ -12,6 +12,10 @@ PUBLISH_VERSION=$(grep "PUBLISH_VERSION = " publish.gradle | sed 's/.*PUBLISH_VE
 PUBLISH_GROUP_ID=$(grep "PUBLISH_GROUP_ID = " publish.gradle | sed 's/.*PUBLISH_GROUP_ID = '\''\(.*\)'\''/\1/')
 PUBLISH_ARTIFACT_ID=$(grep "PUBLISH_ARTIFACT_ID = " publish.gradle | sed 's/.*PUBLISH_ARTIFACT_ID = '\''\(.*\)'\''/\1/')
 
+# 현재 디렉토리 확인
+echo "📁 현재 작업 디렉토리: $(pwd)"
+echo "📁 local.properties 파일 확인: $(ls -la local.properties 2>/dev/null || echo '파일 없음')"
+
 echo "📋 배포 정보:"
 echo "   Group ID: $PUBLISH_GROUP_ID"
 echo "   Artifact ID: $PUBLISH_ARTIFACT_ID"
@@ -27,20 +31,50 @@ echo "📦 Step 2: 새로운 publication 생성..."
 
 echo "📦 Step 3: 번들 생성..."
 cd bio/build/repo
+
+# 디버깅을 위한 변수 확인
+echo "📁 PUBLISH_GROUP_ID: $PUBLISH_GROUP_ID"
+echo "📁 PUBLISH_ARTIFACT_ID: $PUBLISH_ARTIFACT_ID"
+echo "📁 PUBLISH_VERSION: $PUBLISH_VERSION"
+
+# 경로 변수 생성
+GROUP_PATH=$(echo $PUBLISH_GROUP_ID | sed 's/\./\//g')
+echo "📁 GROUP_PATH: $GROUP_PATH"
+
+# zip 명령 실행
 zip -r ../../android-bio-bundle.zip \
-  ${PUBLISH_GROUP_ID//.//}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.aar \
-  ${PUBLISH_GROUP_ID//.//}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.pom \
-  ${PUBLISH_GROUP_ID//.//}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.module \
-  ${PUBLISH_GROUP_ID//.//}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.md5 \
-  ${PUBLISH_GROUP_ID//.//}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.sha1 \
-  ${PUBLISH_GROUP_ID//.//}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.asc
+  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.aar \
+  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.pom \
+  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.module \
+  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.md5 \
+  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.sha1 \
+  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.asc
+
 cd ../../
 
 echo "✅ 번들 생성 완료: $(ls -lh android-bio-bundle.zip)"
 
 echo "🔐 Step 4: 인증 정보 설정..."
-OSSRH_USERNAME="i4oDa5"
-OSSRH_PASSWORD="uh9Wgv6DYCHET2H8M2XLDIKnP82Eigtdz"
+# 현재 디렉토리 재확인
+echo "📁 Step 4 현재 디렉토리: $(pwd)"
+echo "📁 Step 4 local.properties 파일 확인: $(ls -la local.properties 2>/dev/null || echo '파일 없음')"
+
+# local.properties에서 인증 정보 읽기 (절대 경로 사용)
+LOCAL_PROPERTIES_PATH="/Users/taesupyoon/bootpay/client/android/android-bio/local.properties"
+if [ -f "$LOCAL_PROPERTIES_PATH" ]; then
+    OSSRH_USERNAME=$(grep "^ossrhUsername=" "$LOCAL_PROPERTIES_PATH" | cut -d'=' -f2)
+    OSSRH_PASSWORD=$(grep "^ossrhPassword=" "$LOCAL_PROPERTIES_PATH" | cut -d'=' -f2)
+
+    if [ -z "$OSSRH_USERNAME" ] || [ -z "$OSSRH_PASSWORD" ]; then
+        echo "❌ local.properties에서 ossrhUsername 또는 ossrhPassword를 찾을 수 없습니다."
+        exit 1
+    fi
+
+    echo "✅ 인증 정보를 local.properties에서 읽어왔습니다."
+else
+    echo "❌ local.properties 파일을 찾을 수 없습니다: $LOCAL_PROPERTIES_PATH"
+    exit 1
+fi
 BEARER_TOKEN=$(echo -n "${OSSRH_USERNAME}:${OSSRH_PASSWORD}" | base64)
 
 echo "⬆️  Step 5: Central Portal에 업로드..."
