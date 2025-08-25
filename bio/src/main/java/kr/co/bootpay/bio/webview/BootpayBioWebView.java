@@ -86,7 +86,9 @@ public class BootpayBioWebView extends WebView implements BootpayInterface {
     @SuppressLint("JavascriptInterface")
     void payWebSettings(Context context) {
         addJavascriptInterface(new BootpayJavascriptBridge(), BootpayBuildConfig.JSInterfaceBridgeName);
-        getSettings().setAppCacheEnabled(true);
+        
+        // setAppCacheEnabled는 API 33에서 제거됨 - 제거
+        
         getSettings().setAllowFileAccess(false);
         getSettings().setAllowContentAccess(false);
         getSettings().setBuiltInZoomControls(true);

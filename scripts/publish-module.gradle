@@ -1,22 +1,15 @@
 apply plugin: 'maven-publish'
-apply plugin: 'signing'
 
-task androidSourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    if (project.plugins.findPlugin("com.android.library")) {
-        // For Android libraries
-        from android.sourceSets.main.java.srcDirs
-        from android.sourceSets.main.kotlin.srcDirs
-    } else {
-        // For pure Kotlin libraries, in case you have them
-        from sourceSets.main.java.srcDirs
-        from sourceSets.main.kotlin.srcDirs
-    }
-}
+// 서명 설정 읽기
+ext["signing.keyId"] = ''
+ext["signing.password"] = ''
+ext["signing.secretKeyRingFile"] = ''
 
-
-artifacts {
-    archives androidSourcesJar
+File secretPropsFile = project.rootProject.file('local.properties')
+if (secretPropsFile.exists()) {
+    Properties p = new Properties()
+    new FileInputStream(secretPropsFile).withCloseable { is -> p.load(is) }
+    p.each { name, value -> ext[name] = value }
 }
 
 group = PUBLISH_GROUP_ID
@@ -26,22 +19,13 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                // The coordinates of the library, being set from variables that
-                // we'll set up later
                 groupId PUBLISH_GROUP_ID
                 artifactId PUBLISH_ARTIFACT_ID
                 version PUBLISH_VERSION
 
-                // Two artifacts, the `aar` (or `jar`) and the sources
-                if (project.plugins.findPlugin("com.android.library")) {
-                    from components.release
-                } else {
-                    artifact("$buildDir/libs/${project.getName()}-${version}.jar")
-                }
+                // AGP 8.0+에서는 components.release가 자동으로 생성됨
+                from components.release
 
-                artifact androidSourcesJar
-
-                // Mostly self-explanatory metadata
                 pom {
                     name = PUBLISH_ARTIFACT_ID
                     description = PUBLISH_DESCRIPTION
@@ -60,8 +44,6 @@ afterEvaluate {
                         }
                     }
 
-                    // Version control info - if you're using GitHub, follow the
-                    // format as seen here
                     scm {
                         connection = PUBLISH_SCM_CONNECTION
                         developerConnection = PUBLISH_SCM_DEVELOPER_CONNECTION
@@ -70,9 +52,19 @@ afterEvaluate {
                 }
             }
         }
+        repositories {
+            maven {
+                name = "LocalRepo"
+                url = uri("file://${buildDir}/repo")
+            }
+        }
     }
 }
 
-signing {
-    sign publishing.publications
+// 서명 설정이 있을 때만 서명 적용
+if (ext["signing.keyId"] && ext["signing.password"] && ext["signing.secretKeyRingFile"]) {
+    apply plugin: 'signing'
+    signing {
+        sign publishing.publications
+    }
 }

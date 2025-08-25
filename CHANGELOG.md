@@ -1,3 +1,7 @@
+## 5.0.0
+* android 35 support
+* js version update
+
 ## 4.2.5 
 * 농협 카드 스타일 변경 
 

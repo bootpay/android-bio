@@ -25,7 +25,7 @@ import kr.co.bootpay.bio.models.OTPPayload;
 
 public class BioConstants extends BootpayConstant {
 
-    public static final String CDN_URL = "https://webview.bootpay.co.kr/4.2.2";
+    public static final String CDN_URL = "https://webview.bootpay.co.kr/5.1.4";
 
     public static final int REQUEST_TYPE_NONE = -1;
     public static final int REQUEST_PASSWORD_TOKEN = 10; //최초요청시 - 비밀번호 설정하기
