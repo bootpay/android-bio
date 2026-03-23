@@ -24,6 +24,7 @@ import kr.co.bootpay.android.models.Payload;
 
 public class BioPayload  {
     String applicationId = "";
+    String clientKey = "";
     String pg = "";
     String method = "";
     List<String> methods = new ArrayList<>();
@@ -54,6 +55,15 @@ public class BioPayload  {
 
     public BioPayload setApplicationId(String applicationId) {
         this.applicationId = applicationId;
+        return this;
+    }
+
+    public String getClientKey() {
+        return clientKey;
+    }
+
+    public BioPayload setClientKey(String clientKey) {
+        this.clientKey = clientKey;
         return this;
     }
 
@@ -260,7 +270,11 @@ public class BioPayload  {
         JSONObject jsonObject = new JSONObject();
 
         try {
-            jsonObject.put("application_id", applicationId);
+            if(clientKey != null && clientKey.length() > 0) {
+                jsonObject.put("client_key", clientKey);
+            } else {
+                jsonObject.put("application_id", applicationId);
+            }
             jsonObject.put("pg", pg);
             if(methods.size() > 0) {
                 jsonObject.put("method", new JSONArray(methods));
@@ -307,7 +321,11 @@ public class BioPayload  {
         JSONObject jsonObject = new JSONObject();
 
         try {
-            jsonObject.put("application_id", applicationId);
+            if(clientKey != null && clientKey.length() > 0) {
+                jsonObject.put("client_key", clientKey);
+            } else {
+                jsonObject.put("application_id", applicationId);
+            }
             jsonObject.put("pg", pg);
             if(methods.size() > 0) {
                 jsonObject.put("method", new JSONArray(methods));
