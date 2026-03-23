@@ -5,7 +5,7 @@ echo "🚀 Bootpay Android Bio SDK 배포 시작..."
 echo "========================================"
 
 # 프로젝트 루트로 이동
-cd /Users/taesupyoon/bootpay/client/android/android-bio
+cd "$(dirname "$0")"
 
 # publish.gradle에서 버전 정보 읽기
 PUBLISH_VERSION=$(grep "PUBLISH_VERSION = " publish.gradle | sed 's/.*PUBLISH_VERSION = '\''\(.*\)'\''/\1/')
@@ -43,12 +43,7 @@ echo "📁 GROUP_PATH: $GROUP_PATH"
 
 # zip 명령 실행
 zip -r ../../android-bio-bundle.zip \
-  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.aar \
-  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.pom \
-  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.module \
-  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.md5 \
-  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.sha1 \
-  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/*.asc
+  ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/
 
 cd ../../
 
@@ -60,7 +55,7 @@ echo "📁 Step 4 현재 디렉토리: $(pwd)"
 echo "📁 Step 4 local.properties 파일 확인: $(ls -la local.properties 2>/dev/null || echo '파일 없음')"
 
 # local.properties에서 인증 정보 읽기 (절대 경로 사용)
-LOCAL_PROPERTIES_PATH="/Users/taesupyoon/bootpay/client/android/android-bio/local.properties"
+LOCAL_PROPERTIES_PATH="$(pwd)/local.properties"
 if [ -f "$LOCAL_PROPERTIES_PATH" ]; then
     OSSRH_USERNAME=$(grep "^ossrhUsername=" "$LOCAL_PROPERTIES_PATH" | cut -d'=' -f2)
     OSSRH_PASSWORD=$(grep "^ossrhPassword=" "$LOCAL_PROPERTIES_PATH" | cut -d'=' -f2)
