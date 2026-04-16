@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+android-bio-bundle.zip
+bio/android-bio-bundle.zip

@@ -42,10 +42,10 @@ GROUP_PATH=$(echo $PUBLISH_GROUP_ID | sed 's/\./\//g')
 echo "📁 GROUP_PATH: $GROUP_PATH"
 
 # zip 명령 실행
-zip -r ../../android-bio-bundle.zip \
+zip -r ../../../android-bio-bundle.zip \
   ${GROUP_PATH}/${PUBLISH_ARTIFACT_ID}/${PUBLISH_VERSION}/
 
-cd ../../
+cd ../../../
 
 echo "✅ 번들 생성 완료: $(ls -lh android-bio-bundle.zip)"
 
