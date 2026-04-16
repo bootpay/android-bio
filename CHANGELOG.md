@@ -1,3 +1,11 @@
+### 5.1.1
+- Android `<queries>` 패키지 목록 보강 (Android 11+ package visibility)
+  - 삼성 모니모(`net.ib.android.smcard`), 카카오뱅크(`com.kakaobank.channel`) 누락으로
+    나이스페이 앱카드 결제 시 삼성카드→모니모 선택 무반응 / 카카오뱅크 다운로드 링크 이슈 수정
+  - 추가 패키지: KB 스타뱅킹, 신한 쏠/SOL 뱅크, 트레블월렛, 안심클릭 백신, PASS(SKT/LGU+), KCB(SKT),
+    티머니, 캐시비, 원스토어, 알리페이
+  - core `android` SDK 매니페스트와 `<queries>` 동기화
+
 ### 5.1.0
 - webview CDN URL을 5.3.0으로 업데이트
 - client_key 인증 방식 추가
