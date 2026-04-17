@@ -1,3 +1,7 @@
+### 5.1.2
+- core `io.github.bootpay:android` 의존성 5.0.0 → 5.1.1 업데이트
+  - 나이스페이 앱카드 URL 라우팅 픽스 반영 (Monimo 무반응 / KakaoBank 다운로드 링크 이슈 수정)
+
 ### 5.1.1
 - Android `<queries>` 패키지 목록 보강 (Android 11+ package visibility)
   - 삼성 모니모(`net.ib.android.smcard`), 카카오뱅크(`com.kakaobank.channel`) 누락으로

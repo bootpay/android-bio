@@ -2,6 +2,23 @@ plugins {
     id 'com.android.application'
 }
 
+// ===== Bootpay 환경 키 로딩 (local.properties → fallback prod) =====
+def bootpayProps = new Properties()
+def localPropsFile = rootProject.file('local.properties')
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { bootpayProps.load(it) }
+}
+def bootpayEnv = bootpayProps.getProperty('BOOTPAY_ENV', 'production')
+def isBootpayDev = bootpayEnv == 'development'
+
+def bootpayKey = { String devKey, String prodKey, String fallbackDev, String fallbackProd ->
+    def value = bootpayProps.getProperty(isBootpayDev ? devKey : prodKey, '')
+    if (value == null || value.trim().isEmpty()) {
+        return isBootpayDev ? fallbackDev : fallbackProd
+    }
+    return value
+}
+
 android {
     namespace "kr.co.bootpay.android_bio"
     compileSdk 35
@@ -14,6 +31,16 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField "String", "BOOTPAY_ENV", "\"${bootpayEnv}\""
+        buildConfigField "String", "BOOTPAY_APPLICATION_ID", "\"${bootpayKey('BOOTPAY_ANDROID_APPLICATION_ID_DEV', 'BOOTPAY_ANDROID_APPLICATION_ID_PROD', '5b9f51264457636ab9a07cdc', '5b8f6a4d396fa665fdc2b5e8')}\""
+        buildConfigField "String", "BOOTPAY_REST_APPLICATION_ID", "\"${bootpayKey('BOOTPAY_REST_APPLICATION_ID_DEV', 'BOOTPAY_REST_APPLICATION_ID_PROD', '59b731f084382614ebf72215', '5b8f6a4d396fa665fdc2b5ea')}\""
+        buildConfigField "String", "BOOTPAY_PRIVATE_KEY", "\"${bootpayKey('BOOTPAY_PRIVATE_KEY_DEV', 'BOOTPAY_PRIVATE_KEY_PROD', 'WwDv0UjfwFa04wYG0LJZZv1xwraQnlhnHE375n52X0U=', 'rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=')}\""
+        buildConfigField "String", "BOOTPAY_CLIENT_KEY", "\"${bootpayKey('BOOTPAY_CLIENT_KEY_DEV', 'BOOTPAY_CLIENT_KEY_PROD', 'hxS-Up--5RvT6oU6QJE0JA', 'sEN72kYZBiyMNytA8nUGxQ')}\""
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     buildTypes {
@@ -39,7 +66,7 @@ dependencies {
     implementation project(path: ':bio')
 
 
-    implementation 'io.github.bootpay:android:5.0.0'
+    implementation 'io.github.bootpay:android:5.1.1'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'

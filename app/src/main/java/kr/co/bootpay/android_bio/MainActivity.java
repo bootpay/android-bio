@@ -24,16 +24,13 @@ import kr.co.bootpay.android.models.BootUser;
 import kr.co.bootpay.bio.models.BioThemeData;
 
 public class MainActivity extends AppCompatActivity implements BootpayRestImplement {
-    String applicationId = "5b8f6a4d396fa665fdc2b5e8"; //production
-//    String applicationId = "5b9f51264457636ab9a07cdc"; //developement
+    String applicationId = BootpayConstants.application_id;
 
     @Deprecated
-    String restApplicationId = "5b8f6a4d396fa665fdc2b5ea"; //production
-//    String restApplicationId = "5b9f51264457636ab9a07cde"; //developement
+    String restApplicationId = BootpayConstants.rest_application_id;
 
     @Deprecated
-    String privateKey = "rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw="; //production
-//    String privateKey = "sfilSOSVakw+PZA+PRux4Iuwm7a//9CXXudCq9TMDHk="; //developement
+    String privateKey = BootpayConstants.private_key;
 
     boolean isPasswordMode = false;
     boolean isEditdMode = false;
