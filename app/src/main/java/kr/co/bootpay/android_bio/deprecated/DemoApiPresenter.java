@@ -59,6 +59,35 @@ public class DemoApiPresenter {
         });
     }
 
+
+    public void getRestTokenWithClientKey(String clientKey, String serverKey) {
+        final DemoApiPresenter parentScope = this;
+
+        Call<TokenData> dataCall = service.getApi().getRestTokenWithClientKey(clientKey, serverKey);
+        dataCall.enqueue(new Callback<TokenData>() {
+            @Override
+            public void onResponse(Call<TokenData> call, Response<TokenData> response) {
+                try {
+                    if(!response.isSuccessful()) {
+                        Log.d("bootpay error", response.errorBody().string());
+                        return;
+                    }
+
+                    if(parentScope.parent != null) {
+                        parentScope.parent.callbackRestToken(response.body());
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<TokenData> call, Throwable t) {
+
+            }
+        });
+    }
+
     public void getEasyPayUserToken(String restToken, BootUser user) {
         final DemoApiPresenter parentScope = this;
 

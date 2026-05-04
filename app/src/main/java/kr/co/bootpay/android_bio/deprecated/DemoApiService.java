@@ -63,6 +63,14 @@ public class DemoApiService {
                 @Field("private_key") String private_key
         );
 
+        // 권장 방식: client_key/server_key 인증. server_key는 실서비스 클라이언트 앱에 포함하지 말고 반드시 서버사이드에서만 사용하세요.
+        @FormUrlEncoded
+        @POST("/v2/request/token")
+        Call<TokenData> getRestTokenWithClientKey(
+                @Field("client_key") String client_key,
+                @Field("server_key") String server_key
+        );
+
 //        @Deprecated
 //        @FormUrlEncoded
 //        @POST("/v2/request/token")

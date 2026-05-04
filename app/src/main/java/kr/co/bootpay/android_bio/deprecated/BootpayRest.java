@@ -18,6 +18,13 @@ public class BootpayRest {
         presenter.getRestToken(restApplicationId, privateKey);
     }
 
+
+    /** 권장 방식: client_key/server_key 인증. 기존 getRestToken(application_id/private_key)은 legacy 호환용으로 유지합니다. */
+    public static void getRestTokenWithClientKey(Context context, BootpayRestImplement parent, String clientKey, String serverKey) {
+        if (presenter == null) presenter = new DemoApiPresenter(new DemoApiService(context), parent);
+        presenter.getRestTokenWithClientKey(clientKey, serverKey);
+    }
+
     @Deprecated
     public static void getEasyPayUserToken(Context context, kr.co.bootpay.android_bio.deprecated.BootpayRestImplement parent, String restToken, BootUser user) {
         if (presenter == null) presenter = new kr.co.bootpay.android_bio.deprecated.DemoApiPresenter(new DemoApiService(context), parent);

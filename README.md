@@ -57,7 +57,7 @@ BootExtra extra = new BootExtra().setCardQuota("6");
 BioPayload bioPayload = new BioPayload(); 
 
 bioPayload.setPg("nicepay")
-        .setApplicationId(applicationId)
+        .setClientKey(clientKey)
         .setOrderName("bootpay test")
         .setUserToken(easyUserToken)
         .setPrice(50000.0) //최종 결제 금액

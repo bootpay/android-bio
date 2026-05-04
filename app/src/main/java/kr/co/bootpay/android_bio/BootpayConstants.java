@@ -22,4 +22,7 @@ public class BootpayConstants {
 
     // Commerce API
     public static String client_key = BuildConfig.BOOTPAY_CLIENT_KEY;
+
+    // 권장 PG API 서버 인증 키. private_key는 기존 사용자 호환용 legacy 값으로 유지합니다.
+    public static String server_key = BuildConfig.BOOTPAY_SERVER_KEY;
 }

@@ -1,3 +1,7 @@
+## Unreleased
+- example: BioPayload 예제를 client_key 기준으로 전환하고 local.properties production fallback을 유지
+- legacy application_id/private_key 토큰 헬퍼는 호환용으로 유지
+
 ### 5.1.2
 - core `io.github.bootpay:android` 의존성 5.0.0 → 5.1.1 업데이트
   - 나이스페이 앱카드 URL 라우팅 픽스 반영 (Monimo 무반응 / KakaoBank 다운로드 링크 이슈 수정)

@@ -24,13 +24,13 @@ import kr.co.bootpay.android.models.BootUser;
 import kr.co.bootpay.bio.models.BioThemeData;
 
 public class MainActivity extends AppCompatActivity implements BootpayRestImplement {
-    String applicationId = BootpayConstants.application_id;
+    String clientKey = BootpayConstants.client_key;
 
     @Deprecated
     String restApplicationId = BootpayConstants.rest_application_id;
 
     @Deprecated
-    String privateKey = BootpayConstants.private_key;
+    String serverKey = BootpayConstants.server_key;
 
     boolean isPasswordMode = false;
     boolean isEditdMode = false;
@@ -44,19 +44,19 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
     public void goBioPay(View v) {
         isPasswordMode = false;
         isEditdMode = false;
-        BootpayRest.getRestToken(this, this, restApplicationId, privateKey);
+        BootpayRest.getRestTokenWithClientKey(this, this, clientKey, serverKey);
     }
 
     public void goPasswordPay(View v) {
         isPasswordMode = true;
         isEditdMode = false;
-        BootpayRest.getRestToken(this, this, restApplicationId, privateKey);
+        BootpayRest.getRestTokenWithClientKey(this, this, clientKey, serverKey);
     }
 
     public void goEditPayment(View v) {
         isPasswordMode = false;
         isEditdMode = true;
-        BootpayRest.getRestToken(this, this, restApplicationId, privateKey);
+        BootpayRest.getRestTokenWithClientKey(this, this, clientKey, serverKey);
     }
 
 
@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
         bioPayload.setMetadata(map);
 
         bioPayload.setPg("nicepay")
-                .setApplicationId(applicationId)
+                .setClientKey(clientKey)
                 .setOrderName("bootpay test")
                 .setUserToken(easyUserToken)
                 .setPrice(1000.0) //최종 결제 금액
