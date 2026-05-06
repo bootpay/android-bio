@@ -11,7 +11,7 @@
         android:id="@+id/button_bio"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="생체인증 결제 테스트"
+        android:text="생체인증 결제 테스트 (client_key)"
         android:onClick="goBioPay"
         android:textColor="@color/white"
         android:background="@color/blue"
@@ -23,6 +23,30 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/button_bio_legacy"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="생체인증 레거시 테스트 (application_id)"
+        android:onClick="goBioPayLegacy"
+        android:textColor="@color/white"
+        android:background="@color/blue"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/button_bio"  />
+
+    <TextView
+        android:id="@+id/button_bio_missing_key"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="생체인증 키 없음 테스트 (NEED_CLIENT_KEY)"
+        android:onClick="goBioPayMissingKey"
+        android:textColor="@color/white"
+        android:background="@color/blue"
+        android:gravity="center"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/button_bio_legacy"  />
+
+    <TextView
         android:id="@+id/button_password"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -32,7 +56,7 @@
         android:background="@color/blue"
         android:gravity="center"
         android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@+id/button_bio"  />
+        app:layout_constraintTop_toBottomOf="@+id/button_bio_missing_key"  />
 
 
     <TextView

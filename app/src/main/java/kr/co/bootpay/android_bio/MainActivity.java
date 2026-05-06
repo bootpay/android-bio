@@ -24,6 +24,12 @@ import kr.co.bootpay.android.models.BootUser;
 import kr.co.bootpay.bio.models.BioThemeData;
 
 public class MainActivity extends AppCompatActivity implements BootpayRestImplement {
+    private enum AuthMode {
+        CLIENT_KEY,
+        LEGACY_APPLICATION_ID,
+        MISSING_KEY
+    }
+
     String clientKey = BootpayConstants.client_key;
 
     @Deprecated
@@ -32,6 +38,10 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
     @Deprecated
     String serverKey = BootpayConstants.server_key;
 
+    @Deprecated
+    String privateKey = BootpayConstants.private_key;
+
+    AuthMode authMode = AuthMode.CLIENT_KEY;
     boolean isPasswordMode = false;
     boolean isEditdMode = false;
 
@@ -42,21 +52,46 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
     }
 
     public void goBioPay(View v) {
+        authMode = AuthMode.CLIENT_KEY;
         isPasswordMode = false;
         isEditdMode = false;
-        BootpayRest.getRestTokenWithClientKey(this, this, clientKey, serverKey);
+        requestRestToken();
+    }
+
+    public void goBioPayLegacy(View v) {
+        authMode = AuthMode.LEGACY_APPLICATION_ID;
+        isPasswordMode = false;
+        isEditdMode = false;
+        requestRestToken();
+    }
+
+    public void goBioPayMissingKey(View v) {
+        authMode = AuthMode.MISSING_KEY;
+        isPasswordMode = false;
+        isEditdMode = false;
+        requestRestToken();
     }
 
     public void goPasswordPay(View v) {
+        authMode = AuthMode.CLIENT_KEY;
         isPasswordMode = true;
         isEditdMode = false;
-        BootpayRest.getRestTokenWithClientKey(this, this, clientKey, serverKey);
+        requestRestToken();
     }
 
     public void goEditPayment(View v) {
+        authMode = AuthMode.CLIENT_KEY;
         isPasswordMode = false;
         isEditdMode = true;
-        BootpayRest.getRestTokenWithClientKey(this, this, clientKey, serverKey);
+        requestRestToken();
+    }
+
+    private void requestRestToken() {
+        if(authMode == AuthMode.LEGACY_APPLICATION_ID) {
+            BootpayRest.getRestToken(this, this, restApplicationId, privateKey);
+        } else {
+            BootpayRest.getRestTokenWithClientKey(this, this, clientKey, serverKey);
+        }
     }
 
 
@@ -98,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
         bioPayload.setMetadata(map);
 
         bioPayload.setPg("nicepay")
-                .setClientKey(clientKey)
                 .setOrderName("bootpay test")
                 .setUserToken(easyUserToken)
                 .setPrice(1000.0) //최종 결제 금액
@@ -111,6 +145,8 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
                         new BioPrice("쿠폰적용", -25000.0),
                         new BioPrice("배송비", 2500.0)));
 
+        applyAuth(bioPayload);
+
         if(isPasswordMode == true) {
             requestPassword(bioPayload);
         } else if(isEditdMode == true) {
@@ -119,6 +155,15 @@ public class MainActivity extends AppCompatActivity implements BootpayRestImplem
             requestBio(bioPayload);
         }
 
+    }
+
+    private void applyAuth(BioPayload bioPayload) {
+        if(authMode == AuthMode.CLIENT_KEY) {
+            bioPayload.setClientKey(clientKey);
+        } else if(authMode == AuthMode.LEGACY_APPLICATION_ID) {
+            bioPayload.setApplicationId(BootpayConstants.application_id);
+        }
+        // MISSING_KEY는 토큰은 client_key/server_key로 발급받고 payload 키만 비워 NEED_CLIENT_KEY를 검증합니다.
     }
 
     private void requestBio(BioPayload bioPayload) {

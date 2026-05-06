@@ -15,3 +15,6 @@
 local.properties
 android-bio-bundle.zip
 bio/android-bio-bundle.zip
+
+# Local override (committed .env 위에 덮어씌우는 개인 키)
+.env.local

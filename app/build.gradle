@@ -2,9 +2,8 @@ plugins {
     id 'com.android.application'
 }
 
-// ===== Bootpay 환경 키 로딩 (local.properties → fallback prod) =====
+// ===== Bootpay 환경 키 로딩 (committed .env → local.properties override) =====
 def bootpayProps = new Properties()
-// .env를 먼저 읽고, 기존 local.properties가 있으면 같은 키를 override 합니다.
 def envFile = rootProject.file('.env')
 if (envFile.exists()) {
     envFile.withInputStream { bootpayProps.load(it) }
@@ -24,9 +23,8 @@ def bootpayEnv = bootpayValue(bootpayProps.getProperty('BOOTPAY_ENV', 'productio
 if (bootpayEnv != 'development') bootpayEnv = 'production'
 def isBootpayDev = bootpayEnv == 'development'
 
-def bootpayKey = { String devKey, String prodKey, String fallbackDev, String fallbackProd ->
-    def value = bootpayValue(bootpayProps.getProperty(isBootpayDev ? devKey : prodKey, ''))
-    return value ?: (isBootpayDev ? fallbackDev : fallbackProd)
+def bootpayKey = { String devKey, String prodKey ->
+    return bootpayValue(bootpayProps.getProperty(isBootpayDev ? devKey : prodKey, ''))
 }
 
 android {
@@ -43,11 +41,11 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "BOOTPAY_ENV", "\"${bootpayEnv}\""
-        buildConfigField "String", "BOOTPAY_APPLICATION_ID", "\"${bootpayKey('BOOTPAY_ANDROID_APPLICATION_ID_DEV', 'BOOTPAY_ANDROID_APPLICATION_ID_PROD', '5b9f51264457636ab9a07cdc', '5b8f6a4d396fa665fdc2b5e8')}\""
-        buildConfigField "String", "BOOTPAY_REST_APPLICATION_ID", "\"${bootpayKey('BOOTPAY_REST_APPLICATION_ID_DEV', 'BOOTPAY_REST_APPLICATION_ID_PROD', '59b731f084382614ebf72215', '5b8f6a4d396fa665fdc2b5ea')}\""
-        buildConfigField "String", "BOOTPAY_PRIVATE_KEY", "\"${bootpayKey('BOOTPAY_PRIVATE_KEY_DEV', 'BOOTPAY_PRIVATE_KEY_PROD', 'WwDv0UjfwFa04wYG0LJZZv1xwraQnlhnHE375n52X0U=', 'rm6EYECr6aroQVG2ntW0A6LpWnkTgP4uQ3H18sDDUYw=')}\""
-        buildConfigField "String", "BOOTPAY_CLIENT_KEY", "\"${bootpayKey('BOOTPAY_CLIENT_KEY_DEV', 'BOOTPAY_CLIENT_KEY_PROD', 'hxS-Up--5RvT6oU6QJE0JA', 'sEN72kYZBiyMNytA8nUGxQ')}\""
-        buildConfigField "String", "BOOTPAY_SERVER_KEY", "\"${bootpayKey('BOOTPAY_SERVER_KEY_DEV', 'BOOTPAY_SERVER_KEY_PROD', 'r5zxvDcQJiAP2PBQ0aJjSHQtblNmYFt6uFoEMhti_mg=', 'rnZLJamENRgfwTccwmI_Uu9cxsPpAV9X2W-Htg73yfU=')}\""
+        buildConfigField "String", "BOOTPAY_APPLICATION_ID", "\"${bootpayKey('BOOTPAY_ANDROID_APPLICATION_ID_DEV', 'BOOTPAY_ANDROID_APPLICATION_ID_PROD')}\""
+        buildConfigField "String", "BOOTPAY_REST_APPLICATION_ID", "\"${bootpayKey('BOOTPAY_REST_APPLICATION_ID_DEV', 'BOOTPAY_REST_APPLICATION_ID_PROD')}\""
+        buildConfigField "String", "BOOTPAY_PRIVATE_KEY", "\"${bootpayKey('BOOTPAY_PRIVATE_KEY_DEV', 'BOOTPAY_PRIVATE_KEY_PROD')}\""
+        buildConfigField "String", "BOOTPAY_CLIENT_KEY", "\"${bootpayKey('BOOTPAY_CLIENT_KEY_DEV', 'BOOTPAY_CLIENT_KEY_PROD')}\""
+        buildConfigField "String", "BOOTPAY_SERVER_KEY", "\"${bootpayKey('BOOTPAY_SERVER_KEY_DEV', 'BOOTPAY_SERVER_KEY_PROD')}\""
     }
 
     buildFeatures {
