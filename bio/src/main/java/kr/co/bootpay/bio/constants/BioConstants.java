@@ -272,8 +272,8 @@ public class BioConstants extends BootpayConstant {
         scripts.add("BootpaySDK.setDevice('ANDROID');");
 
         if(BioBuildConfig.DEBUG) {
-            scripts.add("Bootpay.setEnvironmentMode('development', 'gosomi.bootpay.co.kr');");
-            scripts.add("BootpaySDK.setEnvironmentMode('development', 'gosomi.bootpay.co.kr');");
+            scripts.add("Bootpay.setEnvironmentMode('development');");
+            scripts.add("BootpaySDK.setEnvironmentMode('development');");
         }
         scripts.add("Bootpay.setDevice('ANDROID');");
         scripts.add("Bootpay.setLogLevel(4);");
